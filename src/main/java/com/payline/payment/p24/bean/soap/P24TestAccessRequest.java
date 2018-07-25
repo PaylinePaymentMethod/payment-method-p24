@@ -1,0 +1,86 @@
+package com.payline.payment.p24.bean.soap;
+
+import com.payline.payment.p24.utils.P24Constants;
+
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+
+/**
+ * Created by Thales on 19/07/2018.
+ */
+public class P24TestAccessRequest extends P24SoapRequest {
+
+    /**
+     * Default constructor
+     */
+    public P24TestAccessRequest() {
+    }
+
+    /**
+     * @param login
+     * @param pass
+     */
+    public P24TestAccessRequest(String login,
+                                String pass) {
+
+        this.mLogin = login;
+        this.mPass = pass;
+
+    }
+
+    public P24TestAccessRequest login(String login) {
+        this.mLogin = login;
+        return this;
+    }
+
+    public P24TestAccessRequest pass(String pwd) {
+        this.mPass = pwd;
+        return this;
+    }
+
+    @Override
+    public void fillSoapMessageBody() throws SOAPException {
+
+        // Get the body part from envelope
+        SOAPBody soapBody = this.mSoapMessage.getSOAPPart().getEnvelope().getBody();
+
+        //*************************
+        // Add elements to the body
+        //*************************
+
+        // <ser:TrnBySessionId>
+        SOAPElement soapElementSer = soapBody.addChildElement(P24Constants.TEST_ACCESS, P24Constants.SER);
+        soapElementSer.setEncodingStyle(P24Constants.SOAP_ENCODING_URL);
+
+        // <login>
+        if (this.mLogin != null) {
+            SOAPElement soapElementLogin = soapElementSer.addChildElement(LOGIN);
+            soapElementLogin.setAttribute(P24Constants.XSI_TYPE, P24Constants.XSD_STRING);
+            soapElementLogin.addTextNode(this.mLogin);
+        }
+
+        // <pass>
+        if (this.mPass != null) {
+            SOAPElement soapElementPass = soapElementSer.addChildElement(PASS);
+            soapElementPass.setAttribute(P24Constants.XSI_TYPE, P24Constants.XSD_STRING);
+            soapElementPass.addTextNode(this.mPass);
+        }
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("class P24TestAccessRequest {\n");
+        sb.append("    login: ").append(toIndentedString(mLogin)).append("\n");
+        sb.append("    pass: ").append(toIndentedString(mPass)).append("\n");
+        sb.append("}");
+
+        return sb.toString();
+
+    }
+
+}
