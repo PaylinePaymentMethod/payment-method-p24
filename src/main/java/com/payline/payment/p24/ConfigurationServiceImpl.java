@@ -32,19 +32,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             for (int i = 1; i <= m.groupCount(); i++) {
                 String[] keyVal = m.group(i).split(":");
                 switch (keyVal[0]) {
-                    case "p24_merchant_id":
-                        errors.put(P24Constants.MERCHANT_ID, keyVal[1]);
-                        break;
-                    case "p24_pos_id":
-                        errors.put(P24Constants.POS_ID, keyVal[1]);
-                        break;
                     case "p24_sign":
-                        errors.put(P24Constants.MERCHANT_KEY, keyVal[1]);
+                        errors.put(P24Constants.MERCHANT_KEY, localization.getSafeLocalizedString("contract.key.wrong", locale));
+                        break;
+                    default:    // corresponding to case "p24_merchant_id" or "p24_pos_id"
+                        errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString("contract.merchantId.wrong", locale));
+                        errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString("contract.posId.wrong", locale));
                         break;
                 }
             }
         } else {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, "Mauvaise reponse de P24");
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.wrongServerResponse", locale));
         }
 
         return errors;
@@ -65,9 +63,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
                 String responseMessage = response.body().string();
                 if (!"error=0".equals(responseMessage)) {
-                    // fixme le response message est bourré... on peut pas s'y fier
                     // response message contains errors
-                    errors.putAll(getErrors(responseMessage));
+                    errors.putAll(getErrors(responseMessage, locale));
                 }
 
             }
@@ -77,7 +74,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         }
     }
 
-    // todo bon message d'erreur pour cette methode
     public void checkSoapConnection(P24TestAccessRequest request, Map<String, String> errors, Locale locale) {
         SOAPMessage soapResponseMessage = SoapHelper.sendSoapMessage(
                 request.buildSoapMessage(),
@@ -87,8 +83,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         if (soapResponseMessage != null) {
             String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
             if (!"true".equals(tag)) {
-                // fixme ca peut venir du merchantId ou du mdp
-                errors.put(P24Constants.MERCHANT_PASSWORD, "mauvais mdp");
+                errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString("contract.merchantId.wrong", locale));
+                errors.put(P24Constants.MERCHANT_PASSWORD, localization.getSafeLocalizedString("contract.password.wrong", locale));
             }
         } else {
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));

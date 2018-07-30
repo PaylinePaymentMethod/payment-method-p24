@@ -13,7 +13,11 @@ public abstract class P24Request {
 
     public P24Request(String merchantId, String posId, String key) {
         this.merchantId = merchantId;
-        this.posId = posId;
+        if( posId == null || posId.length() == 0){
+            this.posId = merchantId;
+        }else {
+            this.posId = posId;
+        }
         this.key = key;
     }
 
