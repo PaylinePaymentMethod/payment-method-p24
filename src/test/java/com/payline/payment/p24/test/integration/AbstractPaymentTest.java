@@ -1,4 +1,4 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.test.integration;
 
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.payment.*;

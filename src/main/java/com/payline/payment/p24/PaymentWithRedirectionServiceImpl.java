@@ -12,12 +12,16 @@ import com.payline.pmapi.bean.payment.response.PaymentResponseSuccess;
 import com.payline.pmapi.bean.payment.response.buyerpaymentidentifier.impl.Email;
 import com.payline.pmapi.service.PaymentWithRedirectionService;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
-import java.util.List;
 
 public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirectionService {
+
+
+    private static final Logger LOG = LogManager.getLogger(PaymentWithRedirectionServiceImpl.class);
 
     /**
      * Get the SOAP response message error code
@@ -115,14 +119,9 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     }
 
 
-    private String getVerifyError(String responseMessage){
-        System.out.println(responseMessage);
+    private String getVerifyError(String responseMessage) {
         String[] s = responseMessage.split("\n");
-
-        System.out.println("1 " +s[0]);
-        System.out.println("2 " +s[1]);
-        System.out.println("3 " +s[2]);
-        System.out.println("4 " +s[3]);
+        LOG.debug("Message : {0} \n 1: {1}; 2: {2}; 3: {3}; 4: {3}", responseMessage, s[0], s[1], s[2], s[3]);
 
         return s[2];
     }

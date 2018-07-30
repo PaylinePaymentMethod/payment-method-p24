@@ -15,5 +15,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void notifyTransactionStatus(NotifyTransactionStatusRequest notifyTransactionStatusRequest) {
+        // Non utilisé par P24.
     }
 }

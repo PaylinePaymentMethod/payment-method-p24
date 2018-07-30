@@ -1,5 +1,6 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.test.integration;
 
+import com.payline.payment.p24.RefundServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
@@ -17,10 +18,7 @@ import org.mockito.InjectMocks;
 import java.math.BigInteger;
 import java.util.Currency;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RefundServiceImplTest {
     private String merchantId = "65840";
@@ -47,7 +45,7 @@ class RefundServiceImplTest {
         Assert.assertFalse(service.canPartial());
     }
 
-    RefundRequest createRefundRequest(){
+    RefundRequest createRefundRequest() {
         String transactionId = "1";
 
         final Amount amount = new Amount(BigInteger.TEN, Currency.getInstance("EUR"));
@@ -67,7 +65,6 @@ class RefundServiceImplTest {
                 .withPartnerConfiguration(partnerConfiguration)
                 .build();
     }
-
 
 
     private Buyer createDefaultBuyer() {

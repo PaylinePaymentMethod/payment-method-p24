@@ -1,5 +1,8 @@
 package com.payline.payment.p24.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.xml.soap.*;
 
 /**
@@ -7,12 +10,15 @@ import javax.xml.soap.*;
  */
 public class SoapHelper {
 
+    private static final Logger LOG = LogManager.getLogger(SoapHelper.class);
+
     /**
      * Build a SOAPMessage with filled envelope
      *
      * @return SOAPMessage : the SOAPMessage
      */
     public static SOAPMessage buildBaseMsg() {
+
 
         SOAPMessage soapMessage = null;
 
@@ -28,7 +34,7 @@ public class SoapHelper {
             soapMessage.getSOAPPart().getEnvelope().addNamespaceDeclaration(P24Constants.SER, P24Constants.SER_URL);
 
         } catch (SOAPException e) {
-            e.printStackTrace();
+            LOG.error(e.getLocalizedMessage(), e);
         }
 
         return soapMessage;
@@ -47,7 +53,7 @@ public class SoapHelper {
         // Don't send message if :
         // - SOAP message is null
         // - URL is null or empty
-        if (soapMessage == null || endpointUrl == null || (endpointUrl != null && endpointUrl.isEmpty())) {
+        if (soapMessage == null || endpointUrl == null || endpointUrl.isEmpty()) {
             return null;
         }
 
@@ -64,13 +70,13 @@ public class SoapHelper {
 
 
         } catch (SOAPException e) {
-            e.printStackTrace();
+            LOG.error(e.getLocalizedMessage(), e);
         } finally {
             if (soapConnection != null) {
                 try {
                     soapConnection.close();
                 } catch (SOAPException e) {
-                    e.printStackTrace();
+                    LOG.warn(e.getLocalizedMessage(), e);
                 }
             }
 
@@ -87,7 +93,7 @@ public class SoapHelper {
      * @return String : the error code value
      */
     public static String getErrorCodeFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
-        return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG__ERROR_CODE);
+        return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG_ERROR_CODE);
     }
 
     /**
@@ -97,7 +103,7 @@ public class SoapHelper {
      * @return String : the error code value
      */
     public static String getErrorMessageFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
-        return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG__ERROR_MESSAGE);
+        return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG_ERROR_MESSAGE);
     }
 
     /**
@@ -125,7 +131,7 @@ public class SoapHelper {
             }
 
         } catch (SOAPException e) {
-            e.printStackTrace();
+            LOG.error(e.getLocalizedMessage(), e);
         }
 
         return tagContent;

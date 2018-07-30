@@ -50,8 +50,8 @@ public class P24Constants {
     public static final String SER_REFUND = "ser:Refund[]";
     public static final String SER_URL = "https://sandbox.przelewy24.pl/external/wsdl/service.php";
 
-    public static final String SOAP_TAG__ERROR_CODE = "errorCode";
-    public static final String SOAP_TAG__ERROR_MESSAGE = "errorMessage";
+    public static final String SOAP_TAG_ERROR_CODE = "errorCode";
+    public static final String SOAP_TAG_ERROR_MESSAGE = "errorMessage";
 
     public static final String URL_ENDPOINT = "https://sandbox.przelewy24.pl/external/wsdl/service.php";
 

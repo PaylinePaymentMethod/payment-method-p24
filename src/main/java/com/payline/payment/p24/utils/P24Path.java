@@ -12,6 +12,7 @@ public enum P24Path {
         this.path = name;
     }
 
+    @Override
     public String toString() {
         return path;
     }

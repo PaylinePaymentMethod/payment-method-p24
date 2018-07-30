@@ -1,5 +1,8 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.test.integration;
 
+import com.payline.payment.p24.ConfigurationServiceImpl;
+import com.payline.payment.p24.PaymentServiceImpl;
+import com.payline.payment.p24.PaymentWithRedirectionServiceImpl;
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.bean.soap.P24TestAccessRequest;
@@ -25,13 +28,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.math.BigInteger;
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class P24PaymentTestIT extends AbstractPaymentTest {
-    private String lang = "FR";
-    private Locale locale = new Locale(lang);
 
     private static final Logger logger = LogManager.getLogger("AbstractPaymentTest");
 

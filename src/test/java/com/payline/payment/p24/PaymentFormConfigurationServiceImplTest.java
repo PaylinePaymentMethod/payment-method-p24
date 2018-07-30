@@ -5,7 +5,6 @@ import com.payline.pmapi.service.PaymentFormConfigurationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentFormConfigurationServiceImplTest {
     @InjectMocks
