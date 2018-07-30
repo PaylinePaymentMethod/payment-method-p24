@@ -23,7 +23,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private LocalizationService localization = LocalizationImpl.getInstance();
 
 
-    private static Map<String, String> getErrors(String responseMessage) {
+    private Map<String, String> getErrors(String responseMessage, Locale locale) {
         Map<String, String> errors = new HashMap<>();
         Matcher m = P24Constants.REGEX_ERROR_MESSAGES.matcher(responseMessage);
 
