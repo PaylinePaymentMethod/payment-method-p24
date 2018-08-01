@@ -10,6 +10,7 @@ public interface SoapRequest {
 
     /**
      * Build the SOAP message from the request's attributes
+     *
      * @return SOAPMessage : the SOAP message
      */
     SOAPMessage buildSoapMessage();

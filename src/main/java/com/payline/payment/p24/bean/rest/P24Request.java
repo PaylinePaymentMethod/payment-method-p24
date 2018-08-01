@@ -13,9 +13,9 @@ public abstract class P24Request {
 
     public P24Request(String merchantId, String posId, String key) {
         this.merchantId = merchantId;
-        if( posId == null || posId.length() == 0){
+        if (posId == null || posId.length() == 0) {
             this.posId = merchantId;
-        }else {
+        } else {
             this.posId = posId;
         }
         this.key = key;
@@ -31,25 +31,13 @@ public abstract class P24Request {
         return merchantId;
     }
 
-//    public void setMerchantId(String merchantId) {
-//        this.merchantId = merchantId;
-//    }
-
     public String getPosId() {
         return posId;
     }
 
-//    public void setPosId(String posId) {
-//        this.posId = posId;
-//    }
-
     public String getKey() {
         return key;
     }
-
-//    public void setKey(String key) {
-//        this.key = key;
-//    }
 
     public abstract Map<String, String> createBodyMap();
 

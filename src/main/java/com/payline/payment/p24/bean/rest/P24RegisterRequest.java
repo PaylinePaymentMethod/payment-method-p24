@@ -71,7 +71,7 @@ public class P24RegisterRequest extends P24Request {
         }
         this.country = buyer.getAddressForType(Buyer.AddressType.BILLING).getCountry();
 
-        if (paymentRequest.getPaylineEnvironment().getRedirectionReturnURL() == null){
+        if (paymentRequest.getPaylineEnvironment().getRedirectionReturnURL() == null) {
             throw new P24InvalidRequestException("redirectionURL is mandatory but not provided");
         }
         this.urlReturn = paymentRequest.getPaylineEnvironment().getRedirectionReturnURL();
@@ -79,7 +79,9 @@ public class P24RegisterRequest extends P24Request {
 
 
         // non mandatory fields
-        if (buyer.getFullName() != null) this.client = buyer.getFullName().toString();
+        if (buyer.getFullName() != null) {
+            this.client = buyer.getFullName().toString();
+        }
         this.address = buyerAddress.getStreet1();
         this.zip = buyerAddress.getZipCode();
         this.city = buyerAddress.getCity();
@@ -137,19 +139,45 @@ public class P24RegisterRequest extends P24Request {
         bodyMap.put(BodyMapKeys.SIGN.getKey(), signature);
 
         // add non mandatory fields if they exist
-        if (client != null) bodyMap.put(BodyMapKeys.CLIENT.getKey(), client);
-        if (address != null) bodyMap.put(BodyMapKeys.ADDRESS.getKey(), address);
-        if (zip != null) bodyMap.put(BodyMapKeys.ZIP.getKey(), zip);
-        if (city != null) bodyMap.put(BodyMapKeys.CITY.getKey(), city);
-        if (phone != null) bodyMap.put(BodyMapKeys.PHONE.getKey(), phone);
-        if (language != null) bodyMap.put(BodyMapKeys.LANGUAGE.getKey(), language);
-        if (waitForResult != null) bodyMap.put(BodyMapKeys.WAIT_FOR_RESULT.getKey(), waitForResult);
-        if (channel != null) bodyMap.put(BodyMapKeys.CHANNEL.getKey(), channel);
-        if (shipping != null) bodyMap.put(BodyMapKeys.SHIPPING.getKey(), shipping);
-        if (transferLabel != null) bodyMap.put(BodyMapKeys.TRANSFER_LABEL.getKey(), transferLabel);
-        if (encoding != null) bodyMap.put(BodyMapKeys.ENCODING.getKey(), encoding);
-        if (urlStatus != null) bodyMap.put(BodyMapKeys.URL_STATUS.getKey(), urlStatus);
-        if (timeLimit != null) bodyMap.put(BodyMapKeys.TIME_LIMIT.getKey(), timeLimit);
+        if (client != null) {
+            bodyMap.put(BodyMapKeys.CLIENT.getKey(), client);
+        }
+        if (address != null) {
+            bodyMap.put(BodyMapKeys.ADDRESS.getKey(), address);
+        }
+        if (zip != null) {
+            bodyMap.put(BodyMapKeys.ZIP.getKey(), zip);
+        }
+        if (city != null) {
+            bodyMap.put(BodyMapKeys.CITY.getKey(), city);
+        }
+        if (phone != null) {
+            bodyMap.put(BodyMapKeys.PHONE.getKey(), phone);
+        }
+        if (language != null) {
+            bodyMap.put(BodyMapKeys.LANGUAGE.getKey(), language);
+        }
+        if (waitForResult != null) {
+            bodyMap.put(BodyMapKeys.WAIT_FOR_RESULT.getKey(), waitForResult);
+        }
+        if (channel != null) {
+            bodyMap.put(BodyMapKeys.CHANNEL.getKey(), channel);
+        }
+        if (shipping != null) {
+            bodyMap.put(BodyMapKeys.SHIPPING.getKey(), shipping);
+        }
+        if (transferLabel != null) {
+            bodyMap.put(BodyMapKeys.TRANSFER_LABEL.getKey(), transferLabel);
+        }
+        if (encoding != null) {
+            bodyMap.put(BodyMapKeys.ENCODING.getKey(), encoding);
+        }
+        if (urlStatus != null) {
+            bodyMap.put(BodyMapKeys.URL_STATUS.getKey(), urlStatus);
+        }
+        if (timeLimit != null) {
+            bodyMap.put(BodyMapKeys.TIME_LIMIT.getKey(), timeLimit);
+        }
 
         return bodyMap;
     }
@@ -171,7 +199,9 @@ public class P24RegisterRequest extends P24Request {
      * @return true if the currency code is accepted by P24 ("PLN", "EUR", "GBP" or "CZK"). else return false
      */
     public static boolean isGoodCurrencyCode(String currencyCode) {
-        if (currencyCode == null) return false;
+        if (currencyCode == null) {
+            return false;
+        }
         switch (currencyCode) {
             case "PLN":
             case "EUR":

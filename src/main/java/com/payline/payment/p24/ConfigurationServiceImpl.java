@@ -15,12 +15,22 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
+
     private static final String CONTRACT = "contract.";
     private static final String LABEL = ".label";
     private static final String DESCRIPTION = ".description";
     private static final String VERSION = "1.0";
     private static final String RELEASE_DATE = "12/12/2012";
-    private LocalizationService localization = LocalizationImpl.getInstance();
+    public static final String WRONG_MERCHANT_ID = "contract.merchantId.wrong";
+
+    private LocalizationService localization;
+
+    private P24HttpClient p24HttpClient;
+
+    public ConfigurationServiceImpl() {
+        localization = LocalizationImpl.getInstance();
+        p24HttpClient = new P24HttpClient();
+    }
 
 
     private Map<String, String> getErrors(String responseMessage, Locale locale) {
@@ -36,7 +46,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                         errors.put(P24Constants.MERCHANT_KEY, localization.getSafeLocalizedString("contract.key.wrong", locale));
                         break;
                     default:    // corresponding to case "p24_merchant_id" or "p24_pos_id"
-                        errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString("contract.merchantId.wrong", locale));
+                        errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
                         errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString("contract.posId.wrong", locale));
                         break;
                 }
@@ -54,7 +64,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             Map<String, String> bodyMap = request.createBodyMap();
 
             // do the request
-            Response response = HttpClient.doPost(P24Path.TEST.toString(), bodyMap);
+            Response response = p24HttpClient.doPost(P24Path.CHECK.toString(), bodyMap);
 
             // parse the response
             if (response.code() != 200) {
@@ -83,7 +93,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         if (soapResponseMessage != null) {
             String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
             if (!"true".equals(tag)) {
-                errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString("contract.merchantId.wrong", locale));
+                errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
                 errors.put(P24Constants.MERCHANT_PASSWORD, localization.getSafeLocalizedString("contract.password.wrong", locale));
             }
         } else {
@@ -168,7 +178,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         // check all fields values
         if (isNotNumeric(merchantId)) {
-            errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString("contract.merchantId.wrong", locale));
+            errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
         }
         if (posId == null || posId.length() == 0) {
             posId = merchantId;
@@ -195,6 +205,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public ReleaseInformation getReleaseInformation() {
         LocalDate date = LocalDate.parse(RELEASE_DATE, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        System.out.println(System.getProperty("test"));
         return ReleaseInformation.ReleaseBuilder.aRelease().withDate(date).withVersion(VERSION).build();
     }
 
@@ -205,9 +216,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     public boolean isNotNumeric(String str) {
-        if (str == null) {
-            return true;
-        } else if (str.isEmpty()) {
+        if (str == null || str.isEmpty()) {
             return true;
         } else {
             for (int i = 0; i < str.length(); ++i) {

@@ -1,7 +1,7 @@
 package com.payline.payment.p24.utils;
 
 public enum P24Path {
-    TEST("testConnection"),
+    CHECK("testConnection"),
     REGISTER("trnRegister"),
     REQUEST("/trnRequest/"),
     VERIFY("trnVerify");

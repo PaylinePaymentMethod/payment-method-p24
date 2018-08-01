@@ -1,4 +1,4 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.test.integration;
 
 import org.junit.Assert;
 import org.junit.Test;

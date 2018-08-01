@@ -29,8 +29,7 @@ public class RefundServiceImpl implements RefundService {
         if (soapResponseMessage != null) {
 
             errorCode = SoapErrorCodeEnum.fromP24CodeValue(
-                    SoapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage)
-            );
+                    SoapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage));
 
             if (errorCode == null) {
                 errorCode = SoapErrorCodeEnum.UNKNOWN_ERROR;
@@ -66,7 +65,7 @@ public class RefundServiceImpl implements RefundService {
         errorCode = getErrorCode(soapResponseMessage);
 
         // ... continue if last ws errorCode = 0
-        if (SoapErrorCodeEnum.OK.equals(errorCode)) {
+        if (SoapErrorCodeEnum.OK == errorCode) {
 
             String trnBySessionIdOrderIdValue = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
 
@@ -87,7 +86,7 @@ public class RefundServiceImpl implements RefundService {
             errorCode = getErrorCode(soapResponseMessage);
 
             // ... continue if last ws errorCode = 0
-            if (SoapErrorCodeEnum.OK.equals(errorCode)) {
+            if (SoapErrorCodeEnum.OK == errorCode) {
                 return RefundResponseSuccess.RefundResponseSuccessBuilder.aRefundResponseSuccess()
                         .withStatusCode("0")
                         .withTransactionId(transactionId)

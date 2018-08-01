@@ -14,10 +14,10 @@ public class P24TrnBySessionIdRequest extends P24SoapRequest {
     /**
      * Default constructor
      */
-    public P24TrnBySessionIdRequest() { }
+    public P24TrnBySessionIdRequest() {
+    }
 
     /**
-     *
      * @param login
      * @param pass
      * @param sessionId
@@ -26,9 +26,9 @@ public class P24TrnBySessionIdRequest extends P24SoapRequest {
                                     String pass,
                                     String sessionId) {
 
-        this.mLogin         = login;
-        this.mPass          = pass;
-        this.mSessionId     = sessionId;
+        this.mLogin = login;
+        this.mPass = pass;
+        this.mSessionId = sessionId;
 
     }
 

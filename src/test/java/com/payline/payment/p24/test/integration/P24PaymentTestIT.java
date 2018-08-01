@@ -28,13 +28,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class P24PaymentTestIT extends AbstractPaymentTest {
+public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
     private static final Logger logger = LogManager.getLogger("AbstractPaymentTest");
 
@@ -88,6 +89,11 @@ public class P24PaymentTestIT extends AbstractPaymentTest {
         return propertyMap;
     }
 
+    @Override
+    protected Map<String, Serializable> generatePaymentFormData() {
+        return null;
+    }
+
     /**
      * The GoogleDriver has to be in path in order to pass this test.
      *
@@ -128,9 +134,14 @@ public class P24PaymentTestIT extends AbstractPaymentTest {
     }
 
     @Override
+    protected String cancelOnPartnerWebsite(String partnerUrl) {
+        return null;
+    }
+
+    @Override
     public PaymentRequest createDefaultPaymentRequest() {
         amount = TestUtils.createAmount("PLN");
-        final ContractConfiguration contractConfiguration = new ContractConfiguration("", this.generateParameterContract());
+        final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
         final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
         order = Order.OrderBuilder.anOrder().withReference(transactionID).build();
@@ -188,7 +199,7 @@ public class P24PaymentTestIT extends AbstractPaymentTest {
 
     @Override
     public PaymentResponse handlePartnerResponse(PaymentWithRedirectionService paymentWithRedirectionService, String transactionId) {
-        final ContractConfiguration contractConfiguration = new ContractConfiguration("", this.generateParameterContract());
+        final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
         final RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withRedirectionContext(transactionID)
                 .withContractConfiguration(contractConfiguration)

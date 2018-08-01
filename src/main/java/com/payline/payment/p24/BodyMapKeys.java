@@ -31,11 +31,11 @@ public enum BodyMapKeys {
 
     private String keyLabel;
 
-    BodyMapKeys(String label){
+    BodyMapKeys(String label) {
         keyLabel = label;
     }
 
     public String getKey() {
-        return  keyLabel;
+        return keyLabel;
     }
 }

@@ -2,8 +2,8 @@ package com.payline.payment.p24;
 
 
 import com.payline.payment.p24.bean.rest.P24RegisterRequest;
-import com.payline.payment.p24.utils.HttpClient;
 import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.P24HttpClient;
 import com.payline.payment.p24.utils.P24InvalidRequestException;
 import com.payline.payment.p24.utils.P24Path;
 import com.payline.pmapi.bean.common.FailureCause;
@@ -22,6 +22,12 @@ import java.util.regex.Matcher;
 
 public class PaymentServiceImpl implements PaymentService {
 
+    private P24HttpClient p24HttpClient;
+
+    public PaymentServiceImpl() {
+        p24HttpClient = new P24HttpClient();
+    }
+
     @Override
     public PaymentResponse paymentRequest(PaymentRequest paymentRequest) {
         try {
@@ -30,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
             Map<String, String> body = registerRequest.createBodyMap();
 
             // do the request
-            Response response = HttpClient.doPost(P24Path.REGISTER.toString(), body);
+            Response response = p24HttpClient.doPost(P24Path.REGISTER.toString(), body);
 
             if (response.code() == 200 && response.body() != null) {
                 String responseMessage = response.body().string();

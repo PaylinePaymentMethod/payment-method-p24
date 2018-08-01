@@ -12,7 +12,7 @@ plugins { id "org.sonarqube" version "2.6.1" }
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
-apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'jacoco'
 
 description = 'payment-method-p24'
 group 'com.payline.payment.p24'
@@ -21,7 +21,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 ext {
-    paymentMethodVersion = '0.9.1-RC1'
+    paymentMethodVersion = '0.11-SNAPSHOT'
     powerMockVersion = '1.7.0'
     releaseDirectoryPath = 'D:/build'
 }
@@ -90,16 +90,16 @@ shadowJar {
     }
 }
 
-
 task buildToLocal(type: Copy) {
     dependsOn shadowJar
     from shadowJar
     into "${releaseDirectoryPath}"
 }
 
-
 task printVersion {
     doLast {
         println version
     }
 }
+
+test.exclude '**/test/integration/*'

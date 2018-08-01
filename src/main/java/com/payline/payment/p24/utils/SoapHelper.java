@@ -27,11 +27,12 @@ public class SoapHelper {
             // Initialize the SOAP message
             soapMessage = MessageFactory.newInstance().createMessage();
 
+            SOAPEnvelope envelope = soapMessage.getSOAPPart().getEnvelope();
             // Fill the SOAP message's envelope
-            soapMessage.getSOAPPart().getEnvelope().addNamespaceDeclaration(P24Constants.SOAP_ENC, P24Constants.SOAP_ENCODING_URL);
-            soapMessage.getSOAPPart().getEnvelope().addNamespaceDeclaration(P24Constants.XSI, P24Constants.XSI_URL);
-            soapMessage.getSOAPPart().getEnvelope().addNamespaceDeclaration(P24Constants.XSD, P24Constants.XSD_URL);
-            soapMessage.getSOAPPart().getEnvelope().addNamespaceDeclaration(P24Constants.SER, P24Constants.SER_URL);
+            envelope.addNamespaceDeclaration(P24Constants.SOAP_ENC, P24Constants.SOAP_ENCODING_URL);
+            envelope.addNamespaceDeclaration(P24Constants.XSI, P24Constants.XSI_URL);
+            envelope.addNamespaceDeclaration(P24Constants.XSD, P24Constants.XSD_URL);
+            envelope.addNamespaceDeclaration(P24Constants.SER, P24Constants.SER_URL);
 
         } catch (SOAPException e) {
             LOG.error(e.getLocalizedMessage(), e);

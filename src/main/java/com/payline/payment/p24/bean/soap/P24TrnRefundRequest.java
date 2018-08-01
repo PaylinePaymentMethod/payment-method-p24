@@ -19,10 +19,12 @@ public class P24TrnRefundRequest extends P24SoapRequest {
     /**
      * Default constructor
      */
-    public P24TrnRefundRequest() { }
+    public P24TrnRefundRequest() {
+    }
 
     /**
      * Constructor
+     *
      * @param login
      * @param pass
      * @param batch
@@ -37,12 +39,12 @@ public class P24TrnRefundRequest extends P24SoapRequest {
                                String sessionId,
                                Integer amount) {
 
-        this.mLogin         = login;
-        this.mPass          = pass;
-        this.mBatch         = batch;
-        this.mOrderId       = orderId;
-        this.mSessionId     = sessionId;
-        this.mAmount        = amount;
+        this.mLogin = login;
+        this.mPass = pass;
+        this.mBatch = batch;
+        this.mOrderId = orderId;
+        this.mSessionId = sessionId;
+        this.mAmount = amount;
 
     }
 
@@ -78,6 +80,7 @@ public class P24TrnRefundRequest extends P24SoapRequest {
 
     /**
      * Fill the SOAP message's body
+     *
      * @throws SOAPException
      */
     @Override

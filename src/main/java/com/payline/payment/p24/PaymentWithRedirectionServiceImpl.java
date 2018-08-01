@@ -23,6 +23,12 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
     private static final Logger LOG = LogManager.getLogger(PaymentWithRedirectionServiceImpl.class);
 
+    private P24HttpClient p24HttpClient;
+
+    public PaymentWithRedirectionServiceImpl() {
+        this.p24HttpClient = new P24HttpClient();
+    }
+
     /**
      * Get the SOAP response message error code
      *
@@ -73,7 +79,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                 // call trnVerify
                 P24VerifyRequest verifyRequest = new P24VerifyRequest(redirectionPaymentRequest, orderId);
-                Response response = HttpClient.doPost(P24Path.VERIFY.toString(), verifyRequest.createBodyMap());
+                Response response = p24HttpClient.doPost(P24Path.VERIFY.toString(), verifyRequest.createBodyMap());
 
                 // parse the response
                 if (response.code() == 200) {
