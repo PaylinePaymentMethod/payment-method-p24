@@ -159,8 +159,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private void addChannelsListBoxes(List<AbstractParameter> parameters, Locale locale) {
         Map<String, String> listBoxList = new HashMap<>();
-        listBoxList.put(localization.getSafeLocalizedString("contract.yes", locale), "true");
-        listBoxList.put(localization.getSafeLocalizedString("contract.no", locale), "false");
+        listBoxList.put("true", localization.getSafeLocalizedString("contract.yes", locale));
+        listBoxList.put("false", localization.getSafeLocalizedString("contract.no", locale));
 
         for (ChannelKeys channelKey : ChannelKeys.values()) {
             final ListBoxParameter channel = new ListBoxParameter();

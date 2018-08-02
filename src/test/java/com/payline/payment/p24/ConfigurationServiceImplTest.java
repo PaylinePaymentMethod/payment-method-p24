@@ -11,12 +11,11 @@ import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +47,24 @@ public class ConfigurationServiceImplTest {
 
     }
 
+
+    @Test
+    public void checkHttpConnectionOK() throws IOException {
+        // create response object
+        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(0, errors.size());
+
+    }
+
     @Test
     public void checkHttpConnection() {
     }
@@ -63,7 +80,7 @@ public class ConfigurationServiceImplTest {
     }
 
     @Test
-    public void check() {
+    public void check() throws IOException {
         // test a good connection test
         String goodMerchantId = "65840";
         String goodPosId = "65840";
@@ -72,6 +89,11 @@ public class ConfigurationServiceImplTest {
 
         String notNumericMerchantId = "foo";
         String notNumericPosId = "bar";
+
+        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
         Map errors = configurationService.check(request);
