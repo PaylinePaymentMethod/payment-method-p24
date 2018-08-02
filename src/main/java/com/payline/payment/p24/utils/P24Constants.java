@@ -3,11 +3,15 @@ package com.payline.payment.p24.utils;
 import java.util.regex.Pattern;
 
 public class P24Constants {
+
+    private P24Constants() {
+        //RAS.
+    }
+
     //
     public static final String ENCODING = "UTF-8";
 
     public static final String SCHEME = "https";
-    public static final String HOST = "sandbox.przelewy24.pl";
 
     public static final Pattern REGEX_ERROR_MESSAGES = Pattern.compile("errorMessage=(.*)");
     public static final Pattern REGEX_TOKEN = Pattern.compile("token=(.+)");
@@ -48,12 +52,10 @@ public class P24Constants {
     public static final String SER = "ser";
     public static final String SER_ARRAY_OF_REFUND = "ser:ArrayOfRefund";
     public static final String SER_REFUND = "ser:Refund[]";
-    public static final String SER_URL = "https://sandbox.przelewy24.pl/external/wsdl/service.php";
 
     public static final String SOAP_TAG_ERROR_CODE = "errorCode";
     public static final String SOAP_TAG_ERROR_MESSAGE = "errorMessage";
 
-    public static final String URL_ENDPOINT = "https://sandbox.przelewy24.pl/external/wsdl/service.php";
-
     public static final String NO_ERROR_CODE = "no code transmitted";
+
 }

@@ -25,8 +25,11 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
     private P24HttpClient p24HttpClient;
 
+    private RequestUtils requestUtils;
+
     public PaymentWithRedirectionServiceImpl() {
         this.p24HttpClient = new P24HttpClient();
+        this.requestUtils = new RequestUtils();
     }
 
     /**
@@ -61,16 +64,27 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     public PaymentResponse finalizeRedirectionPayment(RedirectionPaymentRequest redirectionPaymentRequest) {
         try {
             // get needed infos for SOAP request
+            if (redirectionPaymentRequest.getContractConfiguration() == null) {
+                // TODO
+            }
+
+
             String merchantId = redirectionPaymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_ID).getValue();
             String password = redirectionPaymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_PASSWORD).getValue();
             String sessionId = redirectionPaymentRequest.getOrder().getReference();
 
+            boolean isSandbox = false;
+            try {
+                isSandbox = requestUtils.isSandbox(redirectionPaymentRequest);
+            } catch (P24InvalidRequestException e) {
+                e.printStackTrace();
+            }
             // call /trnBySessionId
             P24TrnBySessionIdRequest sessionIdRequest = new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
-            SOAPMessage soapResponseMessage = SoapHelper.sendSoapMessage(sessionIdRequest.buildSoapMessage(), P24Constants.URL_ENDPOINT);
+            SOAPMessage soapResponseMessage = SoapHelper.sendSoapMessage(sessionIdRequest.buildSoapMessage(isSandbox), P24Url.SOAP_ENDPOINT.getUrl(isSandbox));
 
             // parse the response
-            if (SoapErrorCodeEnum.OK.equals(getErrorCode(soapResponseMessage))) {
+            if (SoapErrorCodeEnum.OK == getErrorCode(soapResponseMessage)) {
 
 
                 // get needed info for REST request
@@ -79,7 +93,9 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                 // call trnVerify
                 P24VerifyRequest verifyRequest = new P24VerifyRequest(redirectionPaymentRequest, orderId);
-                Response response = p24HttpClient.doPost(P24Path.VERIFY.toString(), verifyRequest.createBodyMap());
+
+                String host = P24Url.REST_HOST.getUrl(isSandbox);
+                Response response = p24HttpClient.doPost(host, P24Path.VERIFY, verifyRequest.createBodyMap());
 
                 // parse the response
                 if (response.code() == 200) {

@@ -33,12 +33,12 @@ public abstract class P24SoapRequest implements SoapRequest {
      * @return
      */
     @Override
-    public SOAPMessage buildSoapMessage() {
+    public SOAPMessage buildSoapMessage(boolean isSandbox) {
 
         this.mSoapMessage = null;
 
         // Initialize the SOAP message with filled envelope
-        this.mSoapMessage = SoapHelper.buildBaseMsg();
+        this.mSoapMessage = SoapHelper.buildBaseMsg(isSandbox);
 
         try {
 

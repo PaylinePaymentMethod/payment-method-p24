@@ -2,6 +2,7 @@ package com.payline.payment.p24.test.integration;
 
 import com.payline.payment.p24.RefundServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.RequestUtils;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
@@ -14,6 +15,7 @@ import com.payline.pmapi.service.RefundService;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import java.math.BigInteger;
 import java.util.Currency;
@@ -27,10 +29,14 @@ class RefundServiceImplTest {
     private String password = "76feca7a92aee7d069e32a66b7e8cef4";
 
     @InjectMocks
-    private RefundService service = new RefundServiceImpl();
+    private RefundService service;
+
+    @Mock
+    private RequestUtils requestUtils;
 
     @Test
     void refundRequest() {
+        service = new RefundServiceImpl(requestUtils);
         RefundRequest request = createRefundRequest();
         service.refundRequest(request);
     }

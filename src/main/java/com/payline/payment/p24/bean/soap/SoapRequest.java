@@ -11,9 +11,10 @@ public interface SoapRequest {
     /**
      * Build the SOAP message from the request's attributes
      *
+     * @param isSandbox
      * @return SOAPMessage : the SOAP message
      */
-    SOAPMessage buildSoapMessage();
+    SOAPMessage buildSoapMessage(boolean isSandbox);
 
     /**
      * Fill the SOAP messag's body with the request's attributes

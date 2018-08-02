@@ -48,15 +48,6 @@ public class ConfigurationServiceImplTest {
 
     }
 
-
-    @Test
-    public void isNotNumeric() {
-        Assert.assertTrue(configurationService.isNotNumeric(null));
-        Assert.assertTrue(configurationService.isNotNumeric(""));
-        Assert.assertTrue(configurationService.isNotNumeric("foo"));
-        Assert.assertFalse(configurationService.isNotNumeric("1"));
-    }
-
     @Test
     public void checkHttpConnection() {
     }

@@ -9,32 +9,32 @@ import javax.xml.soap.SOAPException;
 /**
  * Created by Thales on 19/07/2018.
  */
-public class P24TestAccessRequest extends P24SoapRequest {
+public class P24CheckAccessRequest extends P24SoapRequest {
 
     /**
      * Default constructor
      */
-    public P24TestAccessRequest() {
+    public P24CheckAccessRequest() {
     }
 
     /**
      * @param login
      * @param pass
      */
-    public P24TestAccessRequest(String login,
-                                String pass) {
+    public P24CheckAccessRequest(String login,
+                                 String pass) {
 
         this.mLogin = login;
         this.mPass = pass;
 
     }
 
-    public P24TestAccessRequest login(String login) {
+    public P24CheckAccessRequest login(String login) {
         this.mLogin = login;
         return this;
     }
 
-    public P24TestAccessRequest pass(String pwd) {
+    public P24CheckAccessRequest pass(String pwd) {
         this.mPass = pwd;
         return this;
     }

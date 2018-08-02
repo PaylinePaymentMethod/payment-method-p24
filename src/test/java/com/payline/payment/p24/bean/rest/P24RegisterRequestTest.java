@@ -1,25 +1,44 @@
 package com.payline.payment.p24.bean.rest;
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.utils.LocalizationImpl;
+import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.P24InvalidRequestException;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
+import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.Browser;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.Order;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
-import static com.payline.payment.p24.bean.TestUtils.*;
+import static com.payline.payment.p24.bean.TestUtils.CANCEL_URL;
+import static com.payline.payment.p24.bean.TestUtils.SUCCESS_URL;
 
 public class P24RegisterRequestTest {
+
+    private static final PaylineEnvironment paylineEnvironment =
+            new PaylineEnvironment(null, SUCCESS_URL, CANCEL_URL, true);
+
+    private static final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
+
+    @Mock
+    LocalizationImpl localizationService;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
 
     @Test(expected = P24InvalidRequestException.class)
     public void ConstructorInvocationWithoutBuyer() throws P24InvalidRequestException {
@@ -62,9 +81,7 @@ public class P24RegisterRequestTest {
     private static PaymentRequest createInvalidCurrencyPaymentRequest() {
 
         final Amount amount = TestUtils.createAmount("JPY");
-        final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
 
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         final String transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
 
         final Order order = TestUtils.createOrder(transactionID);
@@ -88,9 +105,7 @@ public class P24RegisterRequestTest {
 
     private static PaymentRequest createPaymentRequestWithoutAddressRequest() {
         final Amount amount = TestUtils.createAmount("EUR");
-        final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
 
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         final String transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
 
         final Order order = TestUtils.createOrder(transactionID);
@@ -114,9 +129,7 @@ public class P24RegisterRequestTest {
 
     private static PaymentRequest createPaymentRequestMandatory() {
         final Amount amount = TestUtils.createAmount("EUR");
-        final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
 
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(null, SUCCESS_URL, CANCEL_URL, true);
 
         final String transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
         final Order order = TestUtils.createOrder(transactionID);
@@ -136,6 +149,45 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withBuyer(buyer)
                 .build();
+    }
+
+
+    @Test
+    public void isNotNumeric() {
+        Mockito.when(localizationService.getSafeLocalizedString(Mockito.anyString(), Mockito.any())).thenReturn("erreur");
+
+
+        P24CheckConnectionRequest p24CheckConnectionRequest = getP24CheckConnectionRequest(null);
+        Map<String, String> errors = p24CheckConnectionRequest.validateRequest(localizationService, Locale.FRANCE);
+        Assert.assertEquals(1, errors.size());
+
+        p24CheckConnectionRequest = getP24CheckConnectionRequest(null);
+        errors = p24CheckConnectionRequest.validateRequest(localizationService, Locale.FRANCE);
+        Assert.assertEquals(1, errors.size());
+
+        p24CheckConnectionRequest = getP24CheckConnectionRequest("foo");
+        errors = p24CheckConnectionRequest.validateRequest(localizationService, Locale.FRANCE);
+        Assert.assertEquals(1, errors.size());
+
+        p24CheckConnectionRequest = getP24CheckConnectionRequest("1");
+        errors = p24CheckConnectionRequest.validateRequest(localizationService, Locale.FRANCE);
+        Assert.assertEquals(0, errors.size());
+
+    }
+
+    private P24CheckConnectionRequest getP24CheckConnectionRequest(String toCheck) {
+        Map<String, String> bodyMap = new HashMap<>();
+        bodyMap.put(P24Constants.MERCHANT_ID, toCheck);
+        bodyMap.put(P24Constants.POS_ID, "5");
+        bodyMap.put(P24Constants.MERCHANT_KEY, P24Constants.MERCHANT_KEY);
+        ContractParametersCheckRequest contractParametersCheckRequest =
+                ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
+                        .withContractConfiguration(contractConfiguration)
+                        .withPaylineEnvironment(paylineEnvironment)
+                        .withAccountInfo(bodyMap)
+                        .withLocale(Locale.FRANCE)
+                        .build();
+        return new P24CheckConnectionRequest(contractParametersCheckRequest);
     }
 
 }

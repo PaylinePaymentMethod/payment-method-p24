@@ -2,7 +2,11 @@ package com.payline.payment.p24.bean.rest;
 
 import com.payline.payment.p24.BodyMapKeys;
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
+import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.payment.ContractConfiguration;
+import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -13,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class P24CheckConnectionRequestTest {
@@ -26,20 +32,38 @@ public class P24CheckConnectionRequestTest {
     private SecurityManager securityManager;
 
     @InjectMocks
-    private P24CheckConnectionRequest p24CheckConnectionRequest = new P24CheckConnectionRequest(merchantId, posId, key);
+    private P24CheckConnectionRequest p24CheckConnectionRequest;
 
 
     @Before
     public void setUp() {
+        final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
+        Map<String, String> bodyMap = new HashMap<>();
+        bodyMap.put(P24Constants.MERCHANT_ID, merchantId);
+        bodyMap.put(P24Constants.POS_ID, posId);
+        bodyMap.put(P24Constants.MERCHANT_KEY, P24Constants.MERCHANT_KEY);
+        ContractParametersCheckRequest contractParametersCheckRequest =
+                ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
+                        .withContractConfiguration(contractConfiguration)
+                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withAccountInfo(bodyMap)
+                        .withLocale(Locale.FRANCE).build();
+        p24CheckConnectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
         MockitoAnnotations.initMocks(this);
 
         Assert.assertNotNull(p24CheckConnectionRequest);
     }
 
     @Test(expected = NullPointerException.class)
-    public void badConstructorInvocation() {
-        new P24CheckConnectionRequest(null);
+    public void badPaymentRequestConstructorInvocation() {
+        new P24CheckConnectionRequest((PaymentRequest) null);
     }
+
+    @Test(expected = NullPointerException.class)
+    public void badContractParametersCheckRequestConstructorInvocation() {
+        new P24CheckConnectionRequest((ContractParametersCheckRequest) null);
+    }
+
 
     @Test
     public void goodConstructorInvocation() {

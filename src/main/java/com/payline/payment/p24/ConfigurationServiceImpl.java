@@ -1,7 +1,7 @@
 package com.payline.payment.p24;
 
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
-import com.payline.payment.p24.bean.soap.P24TestAccessRequest;
+import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
 import com.payline.payment.p24.utils.*;
 import com.payline.pmapi.bean.configuration.*;
 import com.payline.pmapi.service.ConfigurationService;
@@ -21,15 +21,20 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private static final String DESCRIPTION = ".description";
     private static final String VERSION = "1.0";
     private static final String RELEASE_DATE = "12/12/2012";
+
+    // Errors messages
     public static final String WRONG_MERCHANT_ID = "contract.merchantId.wrong";
 
     private LocalizationService localization;
 
     private P24HttpClient p24HttpClient;
 
+    private RequestUtils requestUtils;
+
     public ConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
         p24HttpClient = new P24HttpClient();
+        requestUtils = new RequestUtils();
     }
 
 
@@ -63,8 +68,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             // create the body
             Map<String, String> bodyMap = request.createBodyMap();
 
+            boolean isSandbox = requestUtils.isSandbox(request);
+
             // do the request
-            Response response = p24HttpClient.doPost(P24Path.CHECK.toString(), bodyMap);
+            String host = P24Url.REST_HOST.getUrl(isSandbox);
+            Response response = p24HttpClient.doPost(host, P24Path.CHECK, bodyMap);
 
             // parse the response
             if (response.code() != 200) {
@@ -81,14 +89,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         } catch (IOException e) {
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
+
+        } catch (P24InvalidRequestException e) {
+            // FIXME
         }
     }
 
-    public void checkSoapConnection(P24TestAccessRequest request, Map<String, String> errors, Locale locale) {
+    public void checkSoapConnection(P24CheckAccessRequest request, boolean isSandbox, Map<String, String> errors, Locale locale) {
         SOAPMessage soapResponseMessage = SoapHelper.sendSoapMessage(
-                request.buildSoapMessage(),
-                P24Constants.URL_ENDPOINT
-        );
+                request.buildSoapMessage(isSandbox),
+                P24Url.SOAP_ENDPOINT.getUrl(isSandbox));
 
         if (soapResponseMessage != null) {
             String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
@@ -166,35 +176,31 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public Map<String, String> check(ContractParametersCheckRequest contractParametersCheckRequest) {
         Locale locale = contractParametersCheckRequest.getLocale();
-        Map<String, String> errors = new HashMap<>();
 
         // get all fields to check
         final Map<String, String> accountInfo = contractParametersCheckRequest.getAccountInfo();
-        final String merchantId = accountInfo.get(P24Constants.MERCHANT_ID);
-
-        final String key = accountInfo.get(P24Constants.MERCHANT_KEY);
         final String password = accountInfo.get(P24Constants.MERCHANT_PASSWORD);
-        String posId = accountInfo.get(P24Constants.POS_ID);
 
-        // check all fields values
-        if (isNotNumeric(merchantId)) {
-            errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
-        }
-        if (posId == null || posId.length() == 0) {
-            posId = merchantId;
-        } else if (isNotNumeric(posId)) {
-            errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString("contract.posId.wrong", locale));
-        }
+
+        P24CheckConnectionRequest connectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
+        Map<String, String> errors = connectionRequest.validateRequest(localization, locale);
 
         if (errors.isEmpty()) {
             // test the http connection
-            P24CheckConnectionRequest connectionRequest = new P24CheckConnectionRequest(merchantId, posId, key);
+            //TODO
             checkHttpConnection(connectionRequest, errors, locale);
 
             if (errors.isEmpty()) {
                 // test the soap connection
-                P24TestAccessRequest testAccessRequest = new P24TestAccessRequest(merchantId, password);
-                checkSoapConnection(testAccessRequest, errors, locale);
+                boolean isSandBox = false;
+                try {
+                    isSandBox = requestUtils.isSandbox(contractParametersCheckRequest);
+                } catch (P24InvalidRequestException e) {
+                    e.printStackTrace();
+                }
+                P24CheckAccessRequest testAccessRequest =
+                        new P24CheckAccessRequest(connectionRequest.getMerchantId(), password);
+                checkSoapConnection(testAccessRequest, isSandBox, errors, locale);
             }
         }
 
@@ -205,7 +211,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public ReleaseInformation getReleaseInformation() {
         LocalDate date = LocalDate.parse(RELEASE_DATE, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        System.out.println(System.getProperty("test"));
         return ReleaseInformation.ReleaseBuilder.aRelease().withDate(date).withVersion(VERSION).build();
     }
 
@@ -213,18 +218,5 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public String getName(Locale locale) {
         return localization.getSafeLocalizedString("project.name", locale);
 
-    }
-
-    public boolean isNotNumeric(String str) {
-        if (str == null || str.isEmpty()) {
-            return true;
-        } else {
-            for (int i = 0; i < str.length(); ++i) {
-                if (!Character.isDigit(str.charAt(i))) {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 }

@@ -10,6 +10,10 @@ import javax.xml.soap.*;
  */
 public class SoapHelper {
 
+    private SoapHelper() {
+        // ras.
+    }
+
     private static final Logger LOG = LogManager.getLogger(SoapHelper.class);
 
     /**
@@ -17,7 +21,7 @@ public class SoapHelper {
      *
      * @return SOAPMessage : the SOAPMessage
      */
-    public static SOAPMessage buildBaseMsg() {
+    public static SOAPMessage buildBaseMsg(boolean isSandbox) {
 
 
         SOAPMessage soapMessage = null;
@@ -32,7 +36,7 @@ public class SoapHelper {
             envelope.addNamespaceDeclaration(P24Constants.SOAP_ENC, P24Constants.SOAP_ENCODING_URL);
             envelope.addNamespaceDeclaration(P24Constants.XSI, P24Constants.XSI_URL);
             envelope.addNamespaceDeclaration(P24Constants.XSD, P24Constants.XSD_URL);
-            envelope.addNamespaceDeclaration(P24Constants.SER, P24Constants.SER_URL);
+            envelope.addNamespaceDeclaration(P24Constants.SER, P24Url.SOAP_SER.getUrl(isSandbox));
 
         } catch (SOAPException e) {
             LOG.error(e.getLocalizedMessage(), e);

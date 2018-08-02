@@ -3,9 +3,7 @@ package com.payline.payment.p24;
 
 import com.payline.payment.p24.bean.soap.P24TrnBySessionIdRequest;
 import com.payline.payment.p24.bean.soap.P24TrnRefundRequest;
-import com.payline.payment.p24.utils.P24Constants;
-import com.payline.payment.p24.utils.SoapErrorCodeEnum;
-import com.payline.payment.p24.utils.SoapHelper;
+import com.payline.payment.p24.utils.*;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
 import com.payline.pmapi.bean.refund.response.RefundResponse;
@@ -16,6 +14,13 @@ import com.payline.pmapi.service.RefundService;
 import javax.xml.soap.SOAPMessage;
 
 public class RefundServiceImpl implements RefundService {
+
+    private RequestUtils requestUtils;
+
+    public RefundServiceImpl(RequestUtils requestUtils) {
+        this.requestUtils = requestUtils;
+    }
+
     /**
      * Get the SOAP response message error code
      *
@@ -47,6 +52,13 @@ public class RefundServiceImpl implements RefundService {
     public RefundResponse refundRequest(RefundRequest refundRequest) {
         SOAPMessage soapResponseMessage = null;
         SoapErrorCodeEnum errorCode = null;
+        boolean isSandbox;
+        try {
+            isSandbox = requestUtils.isSandbox(refundRequest);
+        } catch (P24InvalidRequestException e) {
+            // FIXME
+            return null;
+        }
 
         // get all needed infos
         String merchantId = refundRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_ID).getValue();
@@ -58,8 +70,8 @@ public class RefundServiceImpl implements RefundService {
         // Call P24.trnBySessionId and get the orderId from response
         P24TrnBySessionIdRequest trnBySessionIdRequest = new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
         soapResponseMessage = SoapHelper.sendSoapMessage(
-                trnBySessionIdRequest.buildSoapMessage(),
-                P24Constants.URL_ENDPOINT
+                trnBySessionIdRequest.buildSoapMessage(isSandbox),
+                P24Url.SOAP_ENDPOINT.getUrl(isSandbox)
         );
 
         errorCode = getErrorCode(soapResponseMessage);
@@ -79,8 +91,8 @@ public class RefundServiceImpl implements RefundService {
                     .amount(amount);
 
             soapResponseMessage = SoapHelper.sendSoapMessage(
-                    p24TrnRefundRequest.buildSoapMessage(),
-                    P24Constants.URL_ENDPOINT
+                    p24TrnRefundRequest.buildSoapMessage(isSandbox),
+                    P24Url.SOAP_ENDPOINT.getUrl(isSandbox)
             );
 
             errorCode = getErrorCode(soapResponseMessage);

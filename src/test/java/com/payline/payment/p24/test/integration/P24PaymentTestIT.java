@@ -5,10 +5,11 @@ import com.payline.payment.p24.PaymentServiceImpl;
 import com.payline.payment.p24.PaymentWithRedirectionServiceImpl;
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
-import com.payline.payment.p24.bean.soap.P24TestAccessRequest;
+import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
+import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
@@ -39,10 +40,12 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
     private static final Logger logger = LogManager.getLogger("AbstractPaymentTest");
 
+    private final PaylineEnvironment paylineEnvironment =
+            new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+
     private PaymentService paymentService = new PaymentServiceImpl();
 
     private ConfigurationServiceImpl configurationServiceImpl = new ConfigurationServiceImpl();
-
 
     private PaymentWithRedirectionServiceImpl paymentWithRedirectionService = new PaymentWithRedirectionServiceImpl();
 
@@ -59,7 +62,18 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     @Test
     public void fullPaymentTest() {
         Map<String, String> errors = new HashMap<>();
-        P24CheckConnectionRequest p24CheckConnectionRequest = new P24CheckConnectionRequest(merchantId, posId, key);
+        final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
+        Map<String, String> bodyMap = new HashMap<>();
+        bodyMap.put(P24Constants.MERCHANT_ID, merchantId);
+        bodyMap.put(P24Constants.POS_ID, posId);
+        bodyMap.put(P24Constants.MERCHANT_KEY, key);
+        ContractParametersCheckRequest contractParametersCheckRequest =
+                ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
+                        .withContractConfiguration(contractConfiguration)
+                        .withPaylineEnvironment(paylineEnvironment)
+                        .withAccountInfo(bodyMap)
+                        .withLocale(Locale.FRANCE).build();
+        P24CheckConnectionRequest p24CheckConnectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
         logger.info(" P24CheckConnectionRequest : {}", p24CheckConnectionRequest);
 
         // check HTTP connection
@@ -69,8 +83,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
         // check SOAP connection
         logger.info(" check SOAP Connection ");
-        P24TestAccessRequest p24TestAccessRequest = new P24TestAccessRequest().login(merchantId).pass(password);
-        configurationServiceImpl.checkSoapConnection(p24TestAccessRequest, errors, Locale.FRENCH);
+        P24CheckAccessRequest p24TestAccessRequest = new P24CheckAccessRequest().login(merchantId).pass(password);
+        configurationServiceImpl.checkSoapConnection(p24TestAccessRequest, true, errors, Locale.FRENCH);
         Assert.assertTrue(errors.isEmpty());
 
         this.fullRedirectionPayment(this.createDefaultPaymentRequest(), paymentService, paymentWithRedirectionService);
@@ -103,7 +117,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     @Override
     protected String payOnPartnerWebsite(final String partnerUrl) {
         // Start browser
-        WebDriver driver = driver = new ChromeDriver();
+        WebDriver driver = new ChromeDriver();
         try {
             driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -142,7 +156,6 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     public PaymentRequest createDefaultPaymentRequest() {
         amount = TestUtils.createAmount("PLN");
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
         order = Order.OrderBuilder.anOrder().withReference(transactionID).build();
         final String softDescriptor = "softDescriptor";
@@ -203,6 +216,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
         final RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withRedirectionContext(transactionID)
                 .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
                 .withOrder(order)
                 .withAmount(amount)
                 .build();
