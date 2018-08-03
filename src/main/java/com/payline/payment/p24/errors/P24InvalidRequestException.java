@@ -1,4 +1,4 @@
-package com.payline.payment.p24.utils;
+package com.payline.payment.p24.errors;
 
 public class P24InvalidRequestException extends Exception {
 

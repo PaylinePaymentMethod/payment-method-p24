@@ -17,6 +17,8 @@ public abstract class P24SoapRequest implements SoapRequest {
 
     private static final Logger LOG = LogManager.getLogger(P24SoapRequest.class);
 
+    private SoapHelper soapHelper;
+
     protected static final String LOGIN = "login";
     protected static final String PASS = "pass";
     protected static final String SESSION_ID = "sessionId";
@@ -26,6 +28,10 @@ public abstract class P24SoapRequest implements SoapRequest {
     protected String mSessionId;
 
     protected SOAPMessage mSoapMessage;
+
+    public P24SoapRequest() {
+        soapHelper = new SoapHelper();
+    }
 
     /**
      * Build the SOAP message
@@ -38,7 +44,7 @@ public abstract class P24SoapRequest implements SoapRequest {
         this.mSoapMessage = null;
 
         // Initialize the SOAP message with filled envelope
-        this.mSoapMessage = SoapHelper.buildBaseMsg(isSandbox);
+        this.mSoapMessage = soapHelper.buildBaseMsg(isSandbox);
 
         try {
 

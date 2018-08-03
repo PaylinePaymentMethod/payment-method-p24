@@ -1,4 +1,4 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.utils.LocalizationService;
 import com.payline.payment.p24.utils.P24Constants;
@@ -11,11 +11,12 @@ import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,24 +48,6 @@ public class ConfigurationServiceImplTest {
 
     }
 
-
-    @Test
-    public void checkHttpConnectionOK() throws IOException {
-        // create response object
-        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
-        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
-
-        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-
-        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
-
-        Map<String, String> errors = new HashMap<>();
-        configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
-
-        Assert.assertEquals(0, errors.size());
-
-    }
-
     @Test
     public void checkHttpConnection() {
     }
@@ -76,33 +59,28 @@ public class ConfigurationServiceImplTest {
     @Test
     public void getParameters() {
         List<AbstractParameter> parameters = configurationService.getParameters(locale);
-        Assert.assertEquals(parameters.size(), 10);
+        Assert.assertEquals(10, parameters.size());
     }
 
-    @Test
-    public void check() throws IOException {
-        // test a good connection test
-        String goodMerchantId = "65840";
-        String goodPosId = "65840";
-        String goodKey = "0f67a7fec13ff180";
-        String goodPassword = "76feca7a92aee7d069e32a66b7e8cef4";
-
-        String notNumericMerchantId = "foo";
-        String notNumericPosId = "bar";
-
-        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
-        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
-        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-
-
-        ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
-        Map errors = configurationService.check(request);
-        Assert.assertEquals(0, errors.size());
-
-        request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
-        errors = configurationService.check(request);
-        Assert.assertEquals(2, errors.size());
-    }
+//    @Test
+//    public void check() {
+//        // test a good connection test
+//        String goodMerchantId = "65840";
+//        String goodPosId = "65840";
+//        String goodKey = "0f67a7fec13ff180";
+//        String goodPassword = "76feca7a92aee7d069e32a66b7e8cef4";
+//
+//        String notNumericMerchantId = "foo";
+//        String notNumericPosId = "bar";
+//
+//        ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
+//        Map errors = configurationService.check(request);
+//        Assert.assertEquals(0, errors.size());
+//
+//        request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
+//        errors = configurationService.check(request);
+//        Assert.assertEquals(2, errors.size());
+//    }
 
     @Test
     public void getReleaseInformation() {
@@ -120,7 +98,7 @@ public class ConfigurationServiceImplTest {
         accountInfo.put(P24Constants.MERCHANT_ID, merchantId);
         accountInfo.put(P24Constants.POS_ID, posId);
         accountInfo.put(P24Constants.MERCHANT_KEY, key);
-        accountInfo.put(P24Constants.MERCHANT_PASSWORD, password);
+        accountInfo.put(P24Constants.MERCHANT_MDP, password);
 
         ContractConfiguration configuration = new ContractConfiguration("test", null);
         PaylineEnvironment environment = new PaylineEnvironment("notificationURL", "redirectionURL", "redirectionCancelURL", true);

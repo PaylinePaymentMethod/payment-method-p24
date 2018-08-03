@@ -1,7 +1,8 @@
 package com.payline.payment.p24.bean.rest;
 
-import com.payline.payment.p24.BodyMapKeys;
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.errors.P24ValidationException;
+import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
@@ -55,7 +56,7 @@ public class P24CheckConnectionRequestTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void badPaymentRequestConstructorInvocation() {
+    public void badPaymentRequestConstructorInvocation() throws P24ValidationException {
         new P24CheckConnectionRequest((PaymentRequest) null);
     }
 
@@ -66,7 +67,7 @@ public class P24CheckConnectionRequestTest {
 
 
     @Test
-    public void goodConstructorInvocation() {
+    public void goodConstructorInvocation() throws P24ValidationException {
 
         PaymentRequest paymentRequest = TestUtils.createDefaultPaymentRequest();
 

@@ -1,11 +1,11 @@
 package com.payline.payment.p24.test.integration;
 
-import com.payline.payment.p24.ConfigurationServiceImpl;
-import com.payline.payment.p24.PaymentServiceImpl;
-import com.payline.payment.p24.PaymentWithRedirectionServiceImpl;
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
+import com.payline.payment.p24.service.ConfigurationServiceImpl;
+import com.payline.payment.p24.service.PaymentServiceImpl;
+import com.payline.payment.p24.service.PaymentWithRedirectionServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
@@ -94,7 +94,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     protected Map<String, ContractProperty> generateParameterContract() {
         final Map<String, ContractProperty> propertyMap = new HashMap<>();
         propertyMap.put(P24Constants.MERCHANT_ID, new ContractProperty(merchantId));
-        propertyMap.put(P24Constants.MERCHANT_PASSWORD, new ContractProperty(password));
+        propertyMap.put(P24Constants.MERCHANT_MDP, new ContractProperty(password));
         propertyMap.put(P24Constants.POS_ID, new ContractProperty(posId));
         propertyMap.put(P24Constants.MERCHANT_KEY, new ContractProperty(key));
         propertyMap.put(P24Constants.TIME_LIMIT, new ContractProperty("15"));

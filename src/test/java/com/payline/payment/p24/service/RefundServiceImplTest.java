@@ -1,8 +1,7 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.utils.SoapHelper;
-import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
 import com.payline.pmapi.bean.refund.response.RefundResponse;
 import com.payline.pmapi.bean.refund.response.impl.RefundResponseFailure;
@@ -44,15 +43,15 @@ public class RefundServiceImplTest {
         Assert.assertFalse(service.canPartial());
     }
 
-    @Test
-    public void getRefundResponseFailure() {
-        String errorCode = "foo";
-        FailureCause failureCause = FailureCause.INVALID_DATA;
-
-        RefundResponseFailure response = service.getRefundResponseFailure(errorCode, failureCause, "0");
-        Assert.assertEquals(errorCode, response.getErrorCode());
-        Assert.assertEquals(failureCause, response.getFailureCause());
-        Assert.assertEquals("0", response.getTransactionId());
-    }
+//    @Test
+//    public void getRefundResponseFailure() {
+//        String errorCode = "foo";
+//        FailureCause failureCause = FailureCause.INVALID_DATA;
+//
+//        RefundResponseFailure response = service.getRefundResponseFailure(errorCode, failureCause, "0");
+//        Assert.assertEquals(errorCode, response.getErrorCode());
+//        Assert.assertEquals(failureCause, response.getFailureCause());
+//        Assert.assertEquals("0", response.getTransactionId());
+//    }
 
 }

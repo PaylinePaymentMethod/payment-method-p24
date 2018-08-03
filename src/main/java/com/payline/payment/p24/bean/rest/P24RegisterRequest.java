@@ -1,9 +1,9 @@
 package com.payline.payment.p24.bean.rest;
 
-import com.payline.payment.p24.BodyMapKeys;
-import com.payline.payment.p24.ChannelKeys;
+import com.payline.payment.p24.errors.P24ValidationException;
+import com.payline.payment.p24.service.enums.BodyMapKeys;
+import com.payline.payment.p24.service.enums.ChannelKeys;
 import com.payline.payment.p24.utils.P24Constants;
-import com.payline.payment.p24.utils.P24InvalidRequestException;
 import com.payline.payment.p24.utils.SecurityManager;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
@@ -42,15 +42,16 @@ public class P24RegisterRequest extends P24Request {
     private String encoding = P24Constants.ENCODING;
 
 
-    public P24RegisterRequest(PaymentRequest paymentRequest) throws P24InvalidRequestException {
+    public P24RegisterRequest(PaymentRequest paymentRequest) throws P24ValidationException {
         super(paymentRequest);
 
         Buyer buyer = paymentRequest.getBuyer();
         if (buyer == null) {
-            throw new P24InvalidRequestException("buyer is mandatory but not provided");
+            throw new P24ValidationException("buyer is mandatory but not provided");
         }
+        // FIXME GET OR GETFORTYPE
         if (buyer.getAddresses() == null || buyer.getAddresses().get(Buyer.AddressType.BILLING) == null) {
-            throw new P24InvalidRequestException("buyer address is mandatory but not provided");
+            throw new P24ValidationException("buyer address is mandatory but not provided");
         }
         Buyer.Address buyerAddress = buyer.getAddresses().get(Buyer.AddressType.BILLING);
 
@@ -59,7 +60,8 @@ public class P24RegisterRequest extends P24Request {
         this.amount = paymentRequest.getAmount().getAmountInSmallestUnit().toString();
 
         if (!isGoodCurrencyCode(paymentRequest.getAmount().getCurrency().getCurrencyCode())) {
-            throw new P24InvalidRequestException("bad currency code (PLN, EUR, GBP, CZK");
+            // FIXME : ask CAA
+            throw new P24ValidationException("bad currency code (PLN, EUR, GBP, CZK");
         }
         this.currency = paymentRequest.getAmount().getCurrency().getCurrencyCode();
 
@@ -67,12 +69,12 @@ public class P24RegisterRequest extends P24Request {
         this.email = buyer.getEmail();
 
         if (buyerAddress.getCountry() == null) {
-            throw new P24InvalidRequestException("country is mandatory but not provided");
+            throw new P24ValidationException("country is mandatory but not provided");
         }
         this.country = buyer.getAddressForType(Buyer.AddressType.BILLING).getCountry();
 
         if (paymentRequest.getPaylineEnvironment().getRedirectionReturnURL() == null) {
-            throw new P24InvalidRequestException("redirectionURL is mandatory but not provided");
+            throw new P24ValidationException("redirectionURL is mandatory but not provided");
         }
         this.urlReturn = paymentRequest.getPaylineEnvironment().getRedirectionReturnURL();
         this.signature = createSignature();
@@ -139,47 +141,34 @@ public class P24RegisterRequest extends P24Request {
         bodyMap.put(BodyMapKeys.SIGN.getKey(), signature);
 
         // add non mandatory fields if they exist
-        if (client != null) {
-            bodyMap.put(BodyMapKeys.CLIENT.getKey(), client);
-        }
-        if (address != null) {
-            bodyMap.put(BodyMapKeys.ADDRESS.getKey(), address);
-        }
-        if (zip != null) {
-            bodyMap.put(BodyMapKeys.ZIP.getKey(), zip);
-        }
-        if (city != null) {
-            bodyMap.put(BodyMapKeys.CITY.getKey(), city);
-        }
-        if (phone != null) {
-            bodyMap.put(BodyMapKeys.PHONE.getKey(), phone);
-        }
-        if (language != null) {
-            bodyMap.put(BodyMapKeys.LANGUAGE.getKey(), language);
-        }
-        if (waitForResult != null) {
-            bodyMap.put(BodyMapKeys.WAIT_FOR_RESULT.getKey(), waitForResult);
-        }
-        if (channel != null) {
-            bodyMap.put(BodyMapKeys.CHANNEL.getKey(), channel);
-        }
-        if (shipping != null) {
-            bodyMap.put(BodyMapKeys.SHIPPING.getKey(), shipping);
-        }
-        if (transferLabel != null) {
-            bodyMap.put(BodyMapKeys.TRANSFER_LABEL.getKey(), transferLabel);
-        }
-        if (encoding != null) {
-            bodyMap.put(BodyMapKeys.ENCODING.getKey(), encoding);
-        }
-        if (urlStatus != null) {
-            bodyMap.put(BodyMapKeys.URL_STATUS.getKey(), urlStatus);
-        }
-        if (timeLimit != null) {
-            bodyMap.put(BodyMapKeys.TIME_LIMIT.getKey(), timeLimit);
-        }
+        addIfNotNull(bodyMap, client, BodyMapKeys.CLIENT);
+        addIfNotNull(bodyMap, address, BodyMapKeys.ADDRESS);
+        addIfNotNull(bodyMap, zip, BodyMapKeys.ZIP);
+        addIfNotNull(bodyMap, city, BodyMapKeys.CITY);
+        addIfNotNull(bodyMap, phone, BodyMapKeys.PHONE);
+        addIfNotNull(bodyMap, language, BodyMapKeys.LANGUAGE);
+        addIfNotNull(bodyMap, waitForResult, BodyMapKeys.WAIT_FOR_RESULT);
+        addIfNotNull(bodyMap, channel, BodyMapKeys.CHANNEL);
+        addIfNotNull(bodyMap, shipping, BodyMapKeys.SHIPPING);
+        addIfNotNull(bodyMap, transferLabel, BodyMapKeys.TRANSFER_LABEL);
+        addIfNotNull(bodyMap, encoding, BodyMapKeys.ENCODING);
+        addIfNotNull(bodyMap, urlStatus, BodyMapKeys.URL_STATUS);
+        addIfNotNull(bodyMap, timeLimit, BodyMapKeys.TIME_LIMIT);
 
         return bodyMap;
+    }
+
+    /**
+     * Put not null field in bodyMap
+     *
+     * @param bodyMap
+     * @param field
+     * @param key
+     */
+    private void addIfNotNull(Map<String, String> bodyMap, String field, BodyMapKeys key) {
+        if (field != null) {
+            bodyMap.put(key.getKey(), field);
+        }
     }
 
     /**

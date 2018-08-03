@@ -1,6 +1,7 @@
 package com.payline.payment.p24.bean.rest;
 
-import com.payline.payment.p24.BodyMapKeys;
+import com.payline.payment.p24.errors.P24ValidationException;
+import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.LocalizationService;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
@@ -11,11 +12,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.payline.payment.p24.ConfigurationServiceImpl.WRONG_MERCHANT_ID;
+import static com.payline.payment.p24.service.ConfigurationServiceImpl.WRONG_MERCHANT_ID;
 
 public class P24CheckConnectionRequest extends P24Request {
 
-    public P24CheckConnectionRequest(PaymentRequest paymentRequest) {
+    public P24CheckConnectionRequest(PaymentRequest paymentRequest) throws P24ValidationException {
         super(paymentRequest);
     }
 

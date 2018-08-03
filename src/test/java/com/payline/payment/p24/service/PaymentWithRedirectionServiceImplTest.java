@@ -1,5 +1,6 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
+import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.utils.SoapHelper;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
@@ -72,8 +73,12 @@ public class PaymentWithRedirectionServiceImplTest {
         InputStream is = new ByteArrayInputStream(s.getBytes());
         SOAPMessage message = MessageFactory.newInstance().createMessage(null, is);
 
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(message);//FIXME passer en non static
-        RedirectionPaymentRequest a = mock(RedirectionPaymentRequest.class, RETURNS_DEEP_STUBS);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(message);
+        RedirectionPaymentRequest a = RedirectionPaymentRequest.builder()
+                .withRedirectionContext("test")
+                .withOrder(TestUtils.createOrder("test"))
+                .withAmount(TestUtils.createAmount("EUR"))
+                .build();
         PaymentResponse response = service.finalizeRedirectionPayment(a);
 
         Assert.assertEquals(PaymentResponseFailure.class, response.getClass());

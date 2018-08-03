@@ -142,7 +142,7 @@ public class TestUtils {
         contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_ID, new ContractProperty("merchantId"));
         contractConfiguration.getContractProperties().put(P24Constants.POS_ID, new ContractProperty("posId"));
         contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_KEY, new ContractProperty("merchantKey"));
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_PASSWORD, new ContractProperty("merchantPassword"));
+        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_MDP, new ContractProperty("merchantPassword"));
 
         return contractConfiguration;
     }

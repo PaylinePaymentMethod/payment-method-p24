@@ -1,6 +1,8 @@
 package com.payline.payment.p24.bean.rest;
 
+import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.RequestUtils;
 import com.payline.pmapi.bean.Request;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
@@ -16,15 +18,16 @@ public abstract class P24Request implements Request {
     private String merchantId;
     private String posId;
     private String key;
+    private RequestUtils requestUtils = new RequestUtils();
 
 
-    public P24Request(PaymentRequest paymentRequest) {
+    public P24Request(PaymentRequest paymentRequest) throws P24ValidationException {
         // FIXME verifs
         this.contractConfiguration = paymentRequest.getContractConfiguration();
         this.paylineEnvironment = paymentRequest.getPaylineEnvironment();
-        this.merchantId = paymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_ID).getValue();
-        this.posId = paymentRequest.getContractConfiguration().getProperty(P24Constants.POS_ID).getValue();
-        this.key = paymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_KEY).getValue();
+        this.merchantId = requestUtils.getContractValue(paymentRequest, P24Constants.MERCHANT_ID);
+        this.posId = requestUtils.getContractValue(paymentRequest, P24Constants.POS_ID);
+        this.key = requestUtils.getContractValue(paymentRequest, P24Constants.MERCHANT_KEY);
     }
 
     public P24Request(ContractParametersCheckRequest contractParametersCheckRequest) {

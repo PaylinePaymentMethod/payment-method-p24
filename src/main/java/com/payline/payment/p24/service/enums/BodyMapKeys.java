@@ -1,4 +1,4 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service.enums;
 
 public enum BodyMapKeys {
 

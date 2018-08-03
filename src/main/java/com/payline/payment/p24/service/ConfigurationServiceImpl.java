@@ -1,7 +1,9 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
+import com.payline.payment.p24.errors.P24ValidationException;
+import com.payline.payment.p24.service.enums.ChannelKeys;
 import com.payline.payment.p24.utils.*;
 import com.payline.pmapi.bean.configuration.*;
 import com.payline.pmapi.service.ConfigurationService;
@@ -31,10 +33,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private RequestUtils requestUtils;
 
+    private SoapHelper soapHelper;
+
     public ConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
         p24HttpClient = new P24HttpClient();
         requestUtils = new RequestUtils();
+        soapHelper = new SoapHelper();
     }
 
 
@@ -90,13 +95,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         } catch (IOException e) {
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
 
-        } catch (P24InvalidRequestException e) {
-            // FIXME
+        } catch (P24ValidationException e) {
+            //FIXME
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
         }
     }
 
     public void checkSoapConnection(P24CheckAccessRequest request, boolean isSandbox, Map<String, String> errors, Locale locale) {
-        SOAPMessage soapResponseMessage = SoapHelper.sendSoapMessage(
+        SOAPMessage soapResponseMessage = soapHelper.sendSoapMessage(
                 request.buildSoapMessage(isSandbox),
                 P24Url.SOAP_ENDPOINT.getUrl(isSandbox));
 
@@ -104,7 +110,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
             if (!"true".equals(tag)) {
                 errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
-                errors.put(P24Constants.MERCHANT_PASSWORD, localization.getSafeLocalizedString("contract.password.wrong", locale));
+                errors.put(P24Constants.MERCHANT_MDP, localization.getSafeLocalizedString("contract.password.wrong", locale));
             }
         } else {
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
@@ -144,7 +150,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         // P24 password of the merchant
         final InputParameter merchantPassword = new InputParameter();
-        merchantPassword.setKey(P24Constants.MERCHANT_PASSWORD);
+        merchantPassword.setKey(P24Constants.MERCHANT_MDP);
         merchantPassword.setLabel(localization.getSafeLocalizedString("contract.merchantPassword.label", locale));
         merchantPassword.setDescription(localization.getSafeLocalizedString("contract.merchantPassword.description", locale));
         merchantPassword.setRequired(true);
@@ -179,7 +185,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         // get all fields to check
         final Map<String, String> accountInfo = contractParametersCheckRequest.getAccountInfo();
-        final String password = accountInfo.get(P24Constants.MERCHANT_PASSWORD);
+        final String password = accountInfo.get(P24Constants.MERCHANT_MDP);
 
 
         P24CheckConnectionRequest connectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
@@ -195,7 +201,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 boolean isSandBox = false;
                 try {
                     isSandBox = requestUtils.isSandbox(contractParametersCheckRequest);
-                } catch (P24InvalidRequestException e) {
+                } catch (P24ValidationException e) {
                     e.printStackTrace();
                 }
                 P24CheckAccessRequest testAccessRequest =

@@ -10,7 +10,7 @@ import javax.xml.soap.*;
  */
 public class SoapHelper {
 
-    private SoapHelper() {
+    public SoapHelper() {
         // ras.
     }
 
@@ -21,7 +21,7 @@ public class SoapHelper {
      *
      * @return SOAPMessage : the SOAPMessage
      */
-    public static SOAPMessage buildBaseMsg(boolean isSandbox) {
+    public SOAPMessage buildBaseMsg(boolean isSandbox) {
 
 
         SOAPMessage soapMessage = null;
@@ -53,7 +53,7 @@ public class SoapHelper {
      * @param endpointUrl : the web service endpoint URL
      * @return SOAPMessage : the SOAP response message
      */
-    public static SOAPMessage sendSoapMessage(SOAPMessage soapMessage, String endpointUrl) {
+    public SOAPMessage sendSoapMessage(SOAPMessage soapMessage, String endpointUrl) {
 
         // Don't send message if :
         // - SOAP message is null

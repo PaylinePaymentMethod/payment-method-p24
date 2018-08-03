@@ -19,7 +19,7 @@ public class P24Constants {
     public static final String MERCHANT_ID = "merchantId";
     public static final String POS_ID = "posId";
     public static final String MERCHANT_KEY = "key";
-    public static final String MERCHANT_PASSWORD = "password";
+    public static final String MERCHANT_MDP = "password";
     public static final String API_VERSION = "3.2";
     public static final String TIME_LIMIT = "timeLimit";
     public static final String SHIPPING = "shipping";

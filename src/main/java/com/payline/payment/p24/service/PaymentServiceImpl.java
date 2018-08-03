@@ -1,7 +1,8 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
 
 import com.payline.payment.p24.bean.rest.P24RegisterRequest;
+import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.utils.*;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
@@ -71,11 +72,10 @@ public class PaymentServiceImpl implements PaymentService {
                 // wrong response code
                 return getPaymentResponseFailure(P24Constants.NO_ERROR_CODE, FailureCause.COMMUNICATION_ERROR);
             }
-
         } catch (IOException e) {
             return getPaymentResponseFailure(P24Constants.NO_ERROR_CODE, FailureCause.INTERNAL_ERROR);
-        } catch (P24InvalidRequestException e) {
-            return getPaymentResponseFailure(e.getMessage(), FailureCause.INTERNAL_ERROR);
+        } catch (P24ValidationException e) {
+            return getPaymentResponseFailure(e.getMessage(), FailureCause.INVALID_DATA);
         }
     }
 

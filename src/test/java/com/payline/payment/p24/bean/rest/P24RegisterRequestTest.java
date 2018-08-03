@@ -1,9 +1,9 @@
 package com.payline.payment.p24.bean.rest;
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.utils.LocalizationImpl;
 import com.payline.payment.p24.utils.P24Constants;
-import com.payline.payment.p24.utils.P24InvalidRequestException;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
@@ -40,26 +40,26 @@ public class P24RegisterRequestTest {
     }
 
 
-    @Test(expected = P24InvalidRequestException.class)
-    public void ConstructorInvocationWithoutBuyer() throws P24InvalidRequestException {
+    @Test(expected = P24ValidationException.class)
+    public void ConstructorInvocationWithoutBuyer() throws P24ValidationException {
         PaymentRequest request = TestUtils.createDefaultPaymentRequest();
         new P24RegisterRequest(request);
     }
 
-    @Test(expected = P24InvalidRequestException.class)
-    public void ConstructorInvocationWithoutAddresses() throws P24InvalidRequestException {
+    @Test(expected = P24ValidationException.class)
+    public void ConstructorInvocationWithoutAddresses() throws P24ValidationException {
         PaymentRequest request = createPaymentRequestWithoutAddressRequest();
         new P24RegisterRequest(request);
     }
 
-    @Test(expected = P24InvalidRequestException.class)
-    public void ConstructorInvocationWithWrongCurrency() throws P24InvalidRequestException {
+    @Test(expected = P24ValidationException.class)
+    public void ConstructorInvocationWithWrongCurrency() throws P24ValidationException {
         PaymentRequest request = createInvalidCurrencyPaymentRequest();
         new P24RegisterRequest(request);
     }
 
     @Test
-    public void createBodyMap() throws P24InvalidRequestException {
+    public void createBodyMap() throws P24ValidationException {
         P24RegisterRequest request = new P24RegisterRequest(createPaymentRequestMandatory());
         Map<String, String> map = request.createBodyMap();
 

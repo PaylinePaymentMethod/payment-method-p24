@@ -1,4 +1,4 @@
-package com.payline.payment.p24;
+package com.payline.payment.p24.service;
 
 import com.payline.pmapi.bean.paymentForm.PaymentFormConfigurationRequest;
 import com.payline.pmapi.bean.paymentForm.PaymentFormConfigurationResponse;
