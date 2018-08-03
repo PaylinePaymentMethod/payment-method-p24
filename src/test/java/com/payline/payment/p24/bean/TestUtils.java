@@ -4,8 +4,11 @@ import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.common.Buyer.Address;
+import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
+import com.payline.pmapi.bean.refund.request.RefundRequest;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -41,6 +44,35 @@ public class TestUtils {
     }
 
     public static PaymentRequest createCompletePaymentRequest() {
+        return createCompletePaymentBuilder().build();
+
+    }
+
+    public static RefundRequest createRefundRequest(String transactionId) {
+        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+//        final String transactionID = createTransactionId();
+        final Amount amount = createAmount("EUR");
+        final Map<String, String> partnerConfiguration = new HashMap<>();
+        return RefundRequest.RefundRequestBuilder.aRefundRequest()
+                .withAmount(amount)
+                .withOrder(createOrder(transactionId, amount))
+                .withBuyer(createDefaultBuyer())
+                .withContractConfiguration(createContractConfiguration())
+                .withPaylineEnvironment(paylineEnvironment)
+                .withTransactionId(transactionId)
+                .withPartnerTransactionId("toto")
+                .withPartnerConfiguration(new PartnerConfiguration(partnerConfiguration))
+                .build();
+    }
+
+    public static RedirectionPaymentRequest createRedirectionPaymentRequest() {
+        RedirectionPaymentRequest request = RedirectionPaymentRequest.builder().build();
+
+
+        return request;
+    }
+
+    public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount("PLN");
         final ContractConfiguration contractConfiguration = createContractConfiguration();
 
@@ -61,9 +93,7 @@ public class TestUtils {
                 .withLocale(locale)
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
-                .withBuyer(buyer)
-                .build();
-
+                .withBuyer(buyer);
     }
 
 
@@ -92,6 +122,10 @@ public class TestUtils {
         return Order.OrderBuilder.anOrder().withReference(transactionID).build();
     }
 
+    public static Order createOrder(String transactionID, Amount amount) {
+        return Order.OrderBuilder.anOrder().withReference(transactionID).withAmount(amount).build();
+    }
+
     public static Buyer.FullName createFullName() {
         return new Buyer.FullName("foo", "bar", Buyer.Civility.UNKNOWN);
     }
@@ -108,6 +142,7 @@ public class TestUtils {
         contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_ID, new ContractProperty("merchantId"));
         contractConfiguration.getContractProperties().put(P24Constants.POS_ID, new ContractProperty("posId"));
         contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_KEY, new ContractProperty("merchantKey"));
+        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_PASSWORD, new ContractProperty("merchantPassword"));
 
         return contractConfiguration;
     }
