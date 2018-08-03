@@ -78,7 +78,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
         // check HTTP connection
         logger.info(" check Http Connection ");
-        configurationServiceImpl.checkHttpConnection(p24CheckConnectionRequest, errors, Locale.FRENCH);
+        configurationServiceImpl.checkHttpConnection(true, p24CheckConnectionRequest, errors, Locale.FRENCH);
         Assert.assertTrue(errors.isEmpty());
 
         // check SOAP connection

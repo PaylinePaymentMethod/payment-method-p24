@@ -68,12 +68,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return errors;
     }
 
-    public void checkHttpConnection(P24CheckConnectionRequest request, Map<String, String> errors, Locale locale) {
+    public void checkHttpConnection(boolean isSandbox, P24CheckConnectionRequest request, Map<String, String> errors, Locale locale) {
         try {
             // create the body
             Map<String, String> bodyMap = request.createBodyMap();
-
-            boolean isSandbox = requestUtils.isSandbox(request);
 
             // do the request
             String host = P24Url.REST_HOST.getUrl(isSandbox);
@@ -89,14 +87,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                     // response message contains errors
                     errors.putAll(getErrors(responseMessage, locale));
                 }
-
             }
-
         } catch (IOException e) {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
-
-        } catch (P24ValidationException e) {
-            //FIXME
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
         }
     }
@@ -191,23 +183,22 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         P24CheckConnectionRequest connectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
         Map<String, String> errors = connectionRequest.validateRequest(localization, locale);
 
+        boolean isSandBox = false;
+        try {
+            isSandBox = requestUtils.isSandbox(contractParametersCheckRequest);
+        } catch (P24ValidationException e) {
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.technicalError", locale));
+        }
+
         if (errors.isEmpty()) {
             // test the http connection
-            //TODO
-            checkHttpConnection(connectionRequest, errors, locale);
+            checkHttpConnection(isSandBox ,connectionRequest, errors, locale);
+        }
 
-            if (errors.isEmpty()) {
-                // test the soap connection
-                boolean isSandBox = false;
-                try {
-                    isSandBox = requestUtils.isSandbox(contractParametersCheckRequest);
-                } catch (P24ValidationException e) {
-                    e.printStackTrace();
-                }
-                P24CheckAccessRequest testAccessRequest =
-                        new P24CheckAccessRequest(connectionRequest.getMerchantId(), password);
-                checkSoapConnection(testAccessRequest, isSandBox, errors, locale);
-            }
+        if (errors.isEmpty()) {
+            // test the soap connection
+            P24CheckAccessRequest testAccessRequest = new P24CheckAccessRequest(connectionRequest.getMerchantId(), password);
+            checkSoapConnection(testAccessRequest, isSandBox, errors, locale);
         }
 
         // return all errors
