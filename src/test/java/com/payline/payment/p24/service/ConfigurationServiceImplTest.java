@@ -48,7 +48,7 @@ public class ConfigurationServiceImplTest {
 
     private ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
     private Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
-    
+
     private String soapOK = "<SOAP-ENV:Envelope SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"https://sandbox.przelewy24.pl/external/wsdl/service.php\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
             "  <SOAP-ENV:Body>" +
             "     <ns1:TestAccessResponse>" +
@@ -73,10 +73,14 @@ public class ConfigurationServiceImplTest {
     @InjectMocks
     private ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
 
-    @Mock private LocalizationService localization;
-    @Mock private P24HttpClient httpClient;
-    @Mock private SoapHelper soapHelper;
-    @Mock private RequestUtils requestUtils;
+    @Mock
+    private LocalizationService localization;
+    @Mock
+    private P24HttpClient httpClient;
+    @Mock
+    private SoapHelper soapHelper;
+    @Mock
+    private RequestUtils requestUtils;
 
     public ConfigurationServiceImplTest() throws IOException, SOAPException {
     }
@@ -103,7 +107,7 @@ public class ConfigurationServiceImplTest {
         P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
 
         Map<String, String> errors = new HashMap<>();
-        configurationService.checkHttpConnection(true,checkConnectionRequest, errors, locale);
+        configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
 
         Assert.assertEquals(0, errors.size());
 
@@ -119,7 +123,7 @@ public class ConfigurationServiceImplTest {
         P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
 
         Map<String, String> errors = new HashMap<>();
-        configurationService.checkHttpConnection(true,checkConnectionRequest, errors, locale);
+        configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
 
         Assert.assertEquals(1, errors.size());
     }
@@ -135,7 +139,7 @@ public class ConfigurationServiceImplTest {
         P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
 
         Map<String, String> errors = new HashMap<>();
-        configurationService.checkHttpConnection(true,checkConnectionRequest, errors, locale);
+        configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
 
         Assert.assertEquals(1, errors.size());
     }
@@ -149,7 +153,7 @@ public class ConfigurationServiceImplTest {
             P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
 
             Map<String, String> errors = new HashMap<>();
-            configurationService.checkHttpConnection(true,checkConnectionRequest, errors, locale);
+            configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
 
             Assert.assertEquals(1, errors.size());
         } catch (IOException e) {
@@ -167,7 +171,7 @@ public class ConfigurationServiceImplTest {
     @Test
     public void checkOK() throws IOException, P24ValidationException {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageOK);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
@@ -178,7 +182,7 @@ public class ConfigurationServiceImplTest {
     @Test
     public void checkWithRestKO() throws IOException, P24ValidationException {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageOK);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
@@ -189,7 +193,7 @@ public class ConfigurationServiceImplTest {
     @Test
     public void checkWithSoapKO() throws IOException, P24ValidationException {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageKO);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageKO);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
@@ -200,7 +204,7 @@ public class ConfigurationServiceImplTest {
     @Test
     public void checkWithSoapError() throws IOException, P24ValidationException {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(null);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(null);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
@@ -211,7 +215,7 @@ public class ConfigurationServiceImplTest {
     @Test
     public void checkWithRequestUtilError() throws IOException, P24ValidationException {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageOK);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(requestUtils.isSandbox(any(ContractParametersCheckRequest.class))).thenThrow(P24ValidationException.class);
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
