@@ -52,7 +52,7 @@ public class P24RegisterRequestTest {
         new P24RegisterRequest(request);
     }
 
-    @Test(expected = P24ValidationException.class)
+    @Test
     public void ConstructorInvocationWithWrongCurrency() throws P24ValidationException {
         PaymentRequest request = createInvalidCurrencyPaymentRequest();
         new P24RegisterRequest(request);
