@@ -1,7 +1,10 @@
 package com.payline.payment.p24.service;
 
+import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.utils.LocalizationService;
 import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.P24HttpClient;
+import com.payline.payment.p24.utils.P24Path;
 import com.payline.pmapi.bean.configuration.AbstractParameter;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest.CheckRequestBuilder;
@@ -9,29 +12,38 @@ import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.mockito.Mockito.*;
+
 public class ConfigurationServiceImplTest {
     private String lang = "FR";
     private Locale locale = new Locale(lang);
+
+    HttpUrl url = new HttpUrl.Builder().scheme("http").host("host").addPathSegment("path").build();
+    Request request = new Request.Builder().url(url).build();
 
     @InjectMocks
     private ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl();
 
     @Mock
     private LocalizationService localization;
+
+    @Mock
+    private P24HttpClient httpClient;
 
     @Before
     public void setUp() {
@@ -41,16 +53,81 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getName() {
-        Mockito.when(localization.getSafeLocalizedString(Mockito.anyString(), Mockito.eq(locale))).thenReturn(lang);
+        when(localization.getSafeLocalizedString(anyString(), eq(locale))).thenReturn(lang);
         String result = configurationService.getName(locale);
         Assert.assertFalse(StringUtils.isEmpty(result));
         Assert.assertEquals(lang, result);
 
     }
 
+
     @Test
-    public void checkHttpConnection() {
+    public void checkHttpConnectionOK() throws IOException {
+        // create response object
+        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(0, errors.size());
+
     }
+
+    @Test
+    public void checkHttpConnectionWithErrorCode() throws IOException {
+        // create response object
+        Response okResponse = new Response.Builder().code(500).request(request).protocol(Protocol.HTTP_2).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(1, errors.size());
+    }
+
+
+    @Test
+    public void checkHttpConnectionWithErrorResponse() throws IOException {
+        // create response object
+        ResponseBody body = ResponseBody.create(MediaType.parse("plain/text"), "I am not the good response");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(body).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(1, errors.size());
+    }
+
+
+    @Test
+    public void checkHttpConnectionWithException() {
+        try {
+            // create response object
+            when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenThrow(IOException.class);
+
+            P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+            Map<String, String> errors = new HashMap<>();
+            configurationService.checkHttpConnection(checkConnectionRequest, errors, locale);
+
+            Assert.assertEquals(1, errors.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Test
     public void checkSoapConnection() {
@@ -62,25 +139,30 @@ public class ConfigurationServiceImplTest {
         Assert.assertEquals(10, parameters.size());
     }
 
-//    @Test
-//    public void check() {
-//        // test a good connection test
-//        String goodMerchantId = "65840";
-//        String goodPosId = "65840";
-//        String goodKey = "0f67a7fec13ff180";
-//        String goodPassword = "76feca7a92aee7d069e32a66b7e8cef4";
-//
-//        String notNumericMerchantId = "foo";
-//        String notNumericPosId = "bar";
-//
-//        ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
-//        Map errors = configurationService.check(request);
-//        Assert.assertEquals(0, errors.size());
-//
-//        request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
-//        errors = configurationService.check(request);
-//        Assert.assertEquals(2, errors.size());
-//    }
+    @Test
+    public void check() throws IOException {
+        // test a good connection test
+        String goodMerchantId = "65840";
+        String goodPosId = "65840";
+        String goodKey = "0f67a7fec13ff180";
+        String goodPassword = "76feca7a92aee7d069e32a66b7e8cef4";
+
+        String notNumericMerchantId = "foo";
+        String notNumericPosId = "bar";
+
+        ResponseBody bodyOK = ResponseBody.create(MediaType.parse("plain/text"), "error=0");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(bodyOK).message("foo").build();
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+
+        ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
+        Map errors = configurationService.check(request);
+        Assert.assertEquals(0, errors.size());
+
+        request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
+        errors = configurationService.check(request);
+        Assert.assertEquals(2, errors.size());
+    }
 
     @Test
     public void getReleaseInformation() {
