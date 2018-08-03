@@ -70,13 +70,6 @@ public class P24RegisterRequestTest {
         Assert.assertNotNull(map);
     }
 
-    @Test
-    public void isGoodCurrencyCode() {
-        Assert.assertFalse(P24RegisterRequest.isGoodCurrencyCode(null));
-        Assert.assertTrue(P24RegisterRequest.isGoodCurrencyCode("EUR"));
-        Assert.assertFalse(P24RegisterRequest.isGoodCurrencyCode("JPY"));
-    }
-
 
     private static PaymentRequest createInvalidCurrencyPaymentRequest() {
 

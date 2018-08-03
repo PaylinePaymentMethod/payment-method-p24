@@ -8,8 +8,16 @@ import com.payline.pmapi.service.PaymentFormConfigurationService;
 import java.util.HashMap;
 
 public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
+
+    /**
+     * Build a new PaymentFormConfigurationResponse
+     *
+     * @param paymentFormConfigurationRequest
+     * @return
+     */
     @Override
     public PaymentFormConfigurationResponse getPaymentFormConfiguration(PaymentFormConfigurationRequest paymentFormConfigurationRequest) {
         return PaymentFormConfigurationResponseBuilder.aPaymentFormConfigurationResponse().withContextPaymentForm(new HashMap<>()).build();
     }
+
 }

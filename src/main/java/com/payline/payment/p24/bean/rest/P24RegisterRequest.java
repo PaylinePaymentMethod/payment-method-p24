@@ -59,7 +59,7 @@ public class P24RegisterRequest extends P24Request {
         this.sessionId = paymentRequest.getOrder().getReference();
         this.amount = paymentRequest.getAmount().getAmountInSmallestUnit().toString();
 
-        if (!isGoodCurrencyCode(paymentRequest.getAmount().getCurrency().getCurrencyCode())) {
+        if (paymentRequest.getAmount().getCurrency().getCurrencyCode() == null) {
             // FIXME : ask CAA
             throw new P24ValidationException("bad currency code (PLN, EUR, GBP, CZK");
         }
@@ -181,24 +181,4 @@ public class P24RegisterRequest extends P24Request {
         return (new SecurityManager()).hash(sessionId, getMerchantId(), amount, currency, getKey());
     }
 
-    /**
-     * check if the currency code is accepted by P24 ("PLN", "EUR", "GBP" or "CZK")
-     *
-     * @param currencyCode the String containing the currencyCode to compare with.
-     * @return true if the currency code is accepted by P24 ("PLN", "EUR", "GBP" or "CZK"). else return false
-     */
-    public static boolean isGoodCurrencyCode(String currencyCode) {
-        if (currencyCode == null) {
-            return false;
-        }
-        switch (currencyCode) {
-            case "PLN":
-            case "EUR":
-            case "GBP":
-            case "CZK":
-                return true;
-            default:
-                return false;
-        }
-    }
 }
