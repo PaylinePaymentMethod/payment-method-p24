@@ -15,11 +15,7 @@ import javax.xml.soap.SOAPMessage;
 
 public class RefundServiceImpl implements RefundService {
 
-    private RequestUtils requestUtils;
-
-    public RefundServiceImpl(RequestUtils requestUtils) {
-        this.requestUtils = requestUtils;
-    }
+    private RequestUtils requestUtils = new RequestUtils();
 
     /**
      * Get the SOAP response message error code
@@ -53,12 +49,6 @@ public class RefundServiceImpl implements RefundService {
         SOAPMessage soapResponseMessage = null;
         SoapErrorCodeEnum errorCode = null;
         boolean isSandbox;
-        try {
-            isSandbox = requestUtils.isSandbox(refundRequest);
-        } catch (P24InvalidRequestException e) {
-            // FIXME
-            return null;
-        }
 
         // get all needed infos
         String merchantId = refundRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_ID).getValue();
@@ -66,6 +56,12 @@ public class RefundServiceImpl implements RefundService {
         String sessionId = refundRequest.getOrder().getReference();
         String transactionId = refundRequest.getTransactionId();
         int amount = refundRequest.getOrder().getAmount().getAmountInSmallestUnit().intValue();
+
+        try {
+            isSandbox = requestUtils.isSandbox(refundRequest);
+        } catch (P24InvalidRequestException e) {
+            return getRefundResponseFailure(e.getMessage(), FailureCause.INVALID_DATA, transactionId);
+        }
 
         // Call P24.trnBySessionId and get the orderId from response
         P24TrnBySessionIdRequest trnBySessionIdRequest = new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
@@ -124,7 +120,7 @@ public class RefundServiceImpl implements RefundService {
     }
 
 
-    private RefundResponseFailure getRefundResponseFailure(String errorCode, final FailureCause failureCause, String transactionId) {
+    public RefundResponseFailure getRefundResponseFailure(String errorCode, final FailureCause failureCause, String transactionId) {
         return RefundResponseFailure.RefundResponseFailureBuilder.aRefundResponseFailure()
                 .withErrorCode(errorCode)
                 .withFailureCause(failureCause)

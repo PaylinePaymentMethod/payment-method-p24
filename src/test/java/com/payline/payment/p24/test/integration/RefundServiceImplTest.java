@@ -1,6 +1,7 @@
 package com.payline.payment.p24.test.integration;
 
 import com.payline.payment.p24.RefundServiceImpl;
+import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.RequestUtils;
 import com.payline.pmapi.bean.common.Amount;
@@ -36,7 +37,7 @@ class RefundServiceImplTest {
 
     @Test
     void refundRequest() {
-        service = new RefundServiceImpl(requestUtils);
+        service = new RefundServiceImpl();
         RefundRequest request = createRefundRequest();
         service.refundRequest(request);
     }

@@ -65,9 +65,8 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
         try {
             // get needed infos for SOAP request
             if (redirectionPaymentRequest.getContractConfiguration() == null) {
-                // TODO
+                return getPaymentResponseFailure("ContractConfiguration is missing", FailureCause.INVALID_DATA);
             }
-
 
             String merchantId = redirectionPaymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_ID).getValue();
             String password = redirectionPaymentRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_PASSWORD).getValue();
@@ -77,7 +76,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
             try {
                 isSandbox = requestUtils.isSandbox(redirectionPaymentRequest);
             } catch (P24InvalidRequestException e) {
-                e.printStackTrace();
+                return getPaymentResponseFailure(e.getMessage(), FailureCause.INVALID_DATA);
             }
             // call /trnBySessionId
             P24TrnBySessionIdRequest sessionIdRequest = new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
@@ -85,7 +84,6 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
             // parse the response
             if (SoapErrorCodeEnum.OK == getErrorCode(soapResponseMessage)) {
-
 
                 // get needed info for REST request
                 String orderId = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
@@ -111,8 +109,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                     } else {
                         // parse the response
-                        String errorCode = getVerifyError(responseMessage);
-                        return getPaymentResponseFailure(errorCode, FailureCause.INVALID_DATA);
+                        return getPaymentResponseFailure(getVerifyError(responseMessage), FailureCause.INVALID_DATA);
 
                     }
                 } else {
@@ -141,11 +138,13 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     }
 
 
-    private String getVerifyError(String responseMessage) {
-        String[] s = responseMessage.split("\n");
-        LOG.debug("Message : {0} \n 1: {1}; 2: {2}; 3: {3}; 4: {3}", responseMessage, s[0], s[1], s[2], s[3]);
+    public String getVerifyError(String responseMessage) {
+        try {
+            return responseMessage.substring(6, 11);
+        } catch (IndexOutOfBoundsException e) {
+            return "unknown error";
+        }
 
-        return s[2];
     }
 
 }

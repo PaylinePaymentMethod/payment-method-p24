@@ -2,7 +2,7 @@ package com.payline.payment.p24;
 
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.utils.SoapHelper;
-
+import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
 import com.payline.pmapi.bean.refund.response.RefundResponse;
 import com.payline.pmapi.bean.refund.response.impl.RefundResponseFailure;
@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class RefundServiceImplTest {
 
     @InjectMocks
@@ -42,6 +42,17 @@ public class RefundServiceImplTest {
     @Test
     public void canPartial() {
         Assert.assertFalse(service.canPartial());
+    }
+
+    @Test
+    public void getRefundResponseFailure() {
+        String errorCode = "foo";
+        FailureCause failureCause = FailureCause.INVALID_DATA;
+
+        RefundResponseFailure response = service.getRefundResponseFailure(errorCode, failureCause, "0");
+        Assert.assertEquals(errorCode, response.getErrorCode());
+        Assert.assertEquals(failureCause, response.getFailureCause());
+        Assert.assertEquals("0", response.getTransactionId());
     }
 
 }
