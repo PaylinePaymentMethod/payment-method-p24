@@ -18,9 +18,11 @@ public class MltiPartRequestBodyBuilder {
         MultipartBody.Builder mbb = new MultipartBody.Builder();
         mbb.setType(MultipartBody.FORM);
         for (Map.Entry<String, String> entry : formData.entrySet()) {
-            mbb.addFormDataPart(entry.getKey(), entry.getValue());
+            if (entry.getValue() != null) {
+                mbb.addFormDataPart(entry.getKey(), entry.getValue());
+            }
         }
-        
+
         return mbb.build();
     }
 

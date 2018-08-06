@@ -6,18 +6,24 @@ import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
 import com.payline.payment.p24.service.ConfigurationServiceImpl;
 import com.payline.payment.p24.service.PaymentServiceImpl;
 import com.payline.payment.p24.service.PaymentWithRedirectionServiceImpl;
+import com.payline.payment.p24.service.RefundServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.PaymentResponseRedirect;
 import com.payline.pmapi.bean.payment.response.PaymentResponseSuccess;
+import com.payline.pmapi.bean.refund.request.RefundRequest;
+import com.payline.pmapi.bean.refund.response.RefundResponse;
+import com.payline.pmapi.bean.refund.response.impl.RefundResponseSuccess;
 import com.payline.pmapi.service.PaymentService;
 import com.payline.pmapi.service.PaymentWithRedirectionService;
+import com.payline.pmapi.service.RefundService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -49,6 +55,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
     private PaymentWithRedirectionServiceImpl paymentWithRedirectionService = new PaymentWithRedirectionServiceImpl();
 
+    private RefundService refundService = new RefundServiceImpl();
+
     private static final String SUCCESS_URL = "http://www.citronrose.com/Payment_Return.aspx";
 
     private String merchantId = "65840";
@@ -56,13 +64,15 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     private String key = "0f67a7fec13ff180";
     private String password = "76feca7a92aee7d069e32a66b7e8cef4";
     private Order order;
+    private Order refundOrder;
     private Amount amount;
     private String transactionID;
 
     @Test
     public void fullPaymentTest() {
-        Map<String, String> errors = new HashMap<>();
+
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
+        Map<String, String> errors = new HashMap<>();
         Map<String, String> bodyMap = new HashMap<>();
         bodyMap.put(P24Constants.MERCHANT_ID, merchantId);
         bodyMap.put(P24Constants.POS_ID, posId);
@@ -88,6 +98,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
         Assert.assertTrue(errors.isEmpty());
 
         this.fullRedirectionPayment(this.createDefaultPaymentRequest(), paymentService, paymentWithRedirectionService);
+
+        // Refund
     }
 
     @Override
@@ -154,9 +166,11 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
     @Override
     public PaymentRequest createDefaultPaymentRequest() {
-        amount = TestUtils.createAmount("PLN");
+
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
-        transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
+        amount = TestUtils.createAmount("PLN");
+        String numaberId = ("" + Calendar.getInstance().getTimeInMillis());
+        transactionID = numaberId.substring(numaberId.length() - 7, numaberId.length() - 1);
         order = Order.OrderBuilder.anOrder().withReference(transactionID).build();
         final String softDescriptor = "softDescriptor";
         final Buyer buyer = TestUtils.createDefaultBuyer();
@@ -206,12 +220,30 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
         Assertions.assertNotNull(p24transactionId);
 
 
+        final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
+        final Buyer buyer = TestUtils.createDefaultBuyer();
+
+        refundOrder = Order.OrderBuilder.anOrder().withReference(transactionID).withAmount(amount).build();
+        RefundRequest refundRequest = RefundRequest.RefundRequestBuilder.aRefundRequest()
+                .withAmount(amount)
+                .withTransactionId(transactionID)
+                .withPartnerTransactionId(transactionID)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withContractConfiguration(contractConfiguration)
+                .withPartnerConfiguration(new PartnerConfiguration(null))
+                .withBuyer(buyer)
+                .withOrder(refundOrder)
+                .build();
+
         // Step 4 : refund
+        RefundResponse refundResponse = refundService.refundRequest(refundRequest);
+        Assertions.assertEquals(RefundResponseSuccess.class, refundResponse.getClass());
 
     }
 
     @Override
     public PaymentResponse handlePartnerResponse(PaymentWithRedirectionService paymentWithRedirectionService, String transactionId) {
+
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", generateParameterContract());
         final RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withRedirectionContext(transactionID)

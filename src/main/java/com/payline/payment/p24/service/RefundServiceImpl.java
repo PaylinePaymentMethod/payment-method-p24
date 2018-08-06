@@ -65,6 +65,7 @@ public class RefundServiceImpl implements RefundService {
             String merchantId = requestUtils.getContractValue(refundRequest, P24Constants.MERCHANT_ID);
             String password = requestUtils.getContractValue(refundRequest, P24Constants.MERCHANT_MDP);
             String sessionId = refundRequest.getOrder().getReference();
+            // FIXME NPA + transactionId ... number format exception
             int amount = refundRequest.getOrder().getAmount().getAmountInSmallestUnit().intValue();
 
             // Call P24.trnBySessionId and get the orderId from response
