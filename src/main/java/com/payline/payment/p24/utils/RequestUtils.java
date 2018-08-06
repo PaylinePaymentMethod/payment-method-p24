@@ -1,5 +1,6 @@
 package com.payline.payment.p24.utils;
 
+import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.pmapi.bean.Request;
 import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
@@ -13,8 +14,6 @@ public class RequestUtils {
 
     // FIXME message
     private static final String ERR_MESS = "";
-
-    private static final String ERR_NO_CONTRACT = "";
 
     private static final String ERR_NO_CONTRACT_PROPERTY = "";
 
@@ -53,8 +52,8 @@ public class RequestUtils {
      */
     public String getContractValue(Request request, String key) throws P24ValidationException {
         if (request.getContractConfiguration() == null) {
-            LOG.error(ERR_NO_CONTRACT);
-            throw new P24ValidationException(ERR_NO_CONTRACT);
+            LOG.error(P24ErrorMessages.MISSING_CONTRACT);
+            throw new P24ValidationException(P24ErrorMessages.MISSING_CONTRACT);
         }
         ContractProperty property = request.getContractConfiguration().getProperty(key);
         if (property == null) {
@@ -64,18 +63,4 @@ public class RequestUtils {
         return property.getValue();
     }
 
-//    public void validateContractConfiguration(ContractConfiguration contractConfiguration, String... keys) throws P24ValidationException {
-//        if (contractConfiguration == null) {
-//            LOG.error(ERR_NO_CONTRACT + String.join("; ", keys));
-//            throw new P24ValidationException(ERR_NO_CONTRACT);
-//        }
-//        for (String key : keys) {
-//            if (contractConfiguration.getProperty(key) == null) {
-//                LOG.error(ERR_NO_CONTRACT_PROPERTY);
-//                throw new P24ValidationException(ERR_NO_CONTRACT_PROPERTY);
-//
-//            }
-//        }
-//        // FIXME
-//    }
 }

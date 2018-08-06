@@ -34,6 +34,7 @@ public class P24Constants {
     public static final String BATCH = "batch";
     public static final String LIST = "list";
     public static final String ORDER_ID = "orderIdFull";
+    public static final String SOAP_ORDER_ID = "orderId";
     public static final String EMAIL = "clientEmail";
     public static final String AMOUNT = "amount";
 
@@ -47,6 +48,7 @@ public class P24Constants {
 
     public static final String XSD = "xsd";
     public static final String XSD_STRING = "xsd:string";
+    public static final String XSD_INT = "xsd:int";
     public static final String XSD_URL = "http://www.w3.org/2001/XMLSchema";
 
     public static final String SER = "ser";

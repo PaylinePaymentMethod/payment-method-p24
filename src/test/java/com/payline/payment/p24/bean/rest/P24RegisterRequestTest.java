@@ -41,7 +41,7 @@ public class P24RegisterRequestTest {
 
 
     @Test(expected = P24ValidationException.class)
-    public void ConstructorInvocationWithoutBuyer() throws P24ValidationException {
+    public void ConstructorInvocationWithoutOrder() throws P24ValidationException {
         PaymentRequest request = TestUtils.createDefaultPaymentRequest();
         new P24RegisterRequest(request);
     }

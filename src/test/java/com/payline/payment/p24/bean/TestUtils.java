@@ -18,6 +18,9 @@ public class TestUtils {
     public static final String SUCCESS_URL = "https://succesurl.com/";
     public static final String CANCEL_URL = "http://localhost/cancelurl.com/";
     public static final String NOTIFICATION_URL = "http://google.com/";
+    public static final String MERCHANT_ID = "merchantId";
+    public static final String POS_ID = "posId";
+    public static final String MERCHANT_KEY = "merchantKey";
 
     /**
      * Create a paymentRequest with default parameters.
@@ -139,9 +142,9 @@ public class TestUtils {
 
     public static ContractConfiguration createContractConfiguration() {
         final ContractConfiguration contractConfiguration = new ContractConfiguration("", new HashMap<>());
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_ID, new ContractProperty("merchantId"));
-        contractConfiguration.getContractProperties().put(P24Constants.POS_ID, new ContractProperty("posId"));
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_KEY, new ContractProperty("merchantKey"));
+        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_ID, new ContractProperty(MERCHANT_ID));
+        contractConfiguration.getContractProperties().put(P24Constants.POS_ID, new ContractProperty(POS_ID));
+        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_KEY, new ContractProperty(MERCHANT_KEY));
         contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_MDP, new ContractProperty("merchantPassword"));
 
         return contractConfiguration;

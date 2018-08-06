@@ -5,8 +5,15 @@ import com.payline.payment.p24.utils.SoapHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 /**
@@ -56,9 +63,11 @@ public abstract class P24SoapRequest implements SoapRequest {
             LOG.error(e.getLocalizedMessage(), e);
         }
 
+        LOG.debug(getSOAPMessageAsString(mSoapMessage));
         return this.mSoapMessage;
 
     }
+
 
     /**
      * Convert the given object to string with each line indented by 4 spaces
@@ -74,4 +83,31 @@ public abstract class P24SoapRequest implements SoapRequest {
 
     }
 
+    public String getSOAPMessageAsString(SOAPMessage soapMessage) {
+        try {
+
+            TransformerFactory tff = TransformerFactory.newInstance();
+            tff.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer tf = tff.newTransformer();
+
+            // Set formatting
+
+            tf.setOutputProperty(OutputKeys.INDENT, "yes");
+            tf.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+                    "2");
+
+            Source sc = soapMessage.getSOAPPart().getContent();
+
+            ByteArrayOutputStream streamOut = new ByteArrayOutputStream();
+            StreamResult result = new StreamResult(streamOut);
+            tf.transform(sc, result);
+
+            return streamOut.toString();
+        } catch (Exception e) {
+            LOG.warn("Exception in getSOAPMessageAsString {}", e.getMessage());
+            return "";
+        }
+
+
+    }
 }

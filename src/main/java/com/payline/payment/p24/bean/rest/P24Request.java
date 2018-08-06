@@ -22,7 +22,6 @@ public abstract class P24Request implements Request {
 
 
     public P24Request(PaymentRequest paymentRequest) throws P24ValidationException {
-        // FIXME verifs
         this.contractConfiguration = paymentRequest.getContractConfiguration();
         this.paylineEnvironment = paymentRequest.getPaylineEnvironment();
         this.merchantId = requestUtils.getContractValue(paymentRequest, P24Constants.MERCHANT_ID);
@@ -31,7 +30,6 @@ public abstract class P24Request implements Request {
     }
 
     public P24Request(ContractParametersCheckRequest contractParametersCheckRequest) {
-        // FIXME verifs
         this.contractConfiguration = contractParametersCheckRequest.getContractConfiguration();
         this.paylineEnvironment = contractParametersCheckRequest.getPaylineEnvironment();
 

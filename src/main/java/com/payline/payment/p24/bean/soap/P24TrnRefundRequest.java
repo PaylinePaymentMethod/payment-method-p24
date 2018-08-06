@@ -114,7 +114,7 @@ public class P24TrnRefundRequest extends P24SoapRequest {
         // <batch>
         if (this.mBatch != null) {
             SOAPElement soapElementBatch = soapElementSer.addChildElement(P24Constants.BATCH);
-            soapElementBatch.setAttribute(P24Constants.XSI_TYPE, P24Constants.XSD_STRING);
+            soapElementBatch.setAttribute(P24Constants.XSI_TYPE, P24Constants.XSD_INT);
             soapElementBatch.addTextNode(String.valueOf(this.mBatch));
         }
 
@@ -130,7 +130,7 @@ public class P24TrnRefundRequest extends P24SoapRequest {
         // <list>
         //    <Refund>
         //       <orderId>
-        SOAPElement soapElementOrderId = soapElementRefund.addChildElement(P24Constants.ORDER_ID);
+        SOAPElement soapElementOrderId = soapElementRefund.addChildElement(P24Constants.SOAP_ORDER_ID);
         soapElementOrderId.addTextNode(String.valueOf(this.mOrderId));
 
         // <list>

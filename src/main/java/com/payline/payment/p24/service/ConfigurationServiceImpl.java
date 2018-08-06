@@ -16,6 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 
+import static com.payline.payment.p24.errors.P24ErrorMessages.*;
+
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     private static final String CONTRACT = "contract.";
@@ -24,8 +26,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private static final String VERSION = "1.0";
     private static final String RELEASE_DATE = "12/12/2012";
 
-    // Errors messages
-    public static final String WRONG_MERCHANT_ID = "contract.merchantId.wrong";
 
     private LocalizationService localization;
 
@@ -53,16 +53,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 String[] keyVal = m.group(i).split(":");
                 switch (keyVal[0]) {
                     case "p24_sign":
-                        errors.put(P24Constants.MERCHANT_KEY, localization.getSafeLocalizedString("contract.key.wrong", locale));
+                        errors.put(P24Constants.MERCHANT_KEY, localization.getSafeLocalizedString(WRONG_KEY, locale));
                         break;
                     default:    // corresponding to case "p24_merchant_id" or "p24_pos_id"
                         errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
-                        errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString("contract.posId.wrong", locale));
+                        errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString(WRONG_POS_ID, locale));
                         break;
                 }
             }
         } else {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.wrongServerResponse", locale));
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(WRONG_SEVER_RESPONSE, locale));
         }
 
         return errors;
@@ -79,7 +79,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
             // parse the response
             if (response.code() != 200) {
-                errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.wrongServerResponse", locale));
+                errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(WRONG_SEVER_RESPONSE, locale));
             } else {
 
                 String responseMessage = response.body().string();
@@ -89,7 +89,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 }
             }
         } catch (IOException e) {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(NETWORK_ERROR, locale));
         }
     }
 
@@ -102,10 +102,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
             if (!"true".equals(tag)) {
                 errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
-                errors.put(P24Constants.MERCHANT_MDP, localization.getSafeLocalizedString("contract.password.wrong", locale));
+                errors.put(P24Constants.MERCHANT_MDP, localization.getSafeLocalizedString(WRONG_PASS, locale));
             }
         } else {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.error.networkError", locale));
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(NETWORK_ERROR, locale));
         }
     }
 
@@ -187,12 +187,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         try {
             isSandBox = requestUtils.isSandbox(contractParametersCheckRequest);
         } catch (P24ValidationException e) {
-            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString("contract.technicalError", locale));
+            errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(TECHNICAL_ERROR, locale));
         }
 
         if (errors.isEmpty()) {
             // test the http connection
-            checkHttpConnection(isSandBox ,connectionRequest, errors, locale);
+            checkHttpConnection(isSandBox, connectionRequest, errors, locale);
         }
 
         if (errors.isEmpty()) {

@@ -142,7 +142,44 @@ public class ConfigurationServiceImplTest {
         configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
 
         Assert.assertEquals(1, errors.size());
+        Assert.assertTrue(errors.keySet().contains(ContractParametersCheckRequest.GENERIC_ERROR));
     }
+
+    @Test
+    public void checkHttpConnectionParseErrorResponse_p24_sign() throws IOException {
+        // create response object
+        ResponseBody body = ResponseBody.create(MediaType.parse("plain/text"), "error=125&=errorMessage=p24_sign:15");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(body).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(1, errors.size());
+        Assert.assertTrue(errors.keySet().contains(P24Constants.MERCHANT_KEY));
+    }
+
+    @Test
+    public void checkHttpConnectionParseErrorResponse_other() throws IOException {
+        // create response object
+        ResponseBody body = ResponseBody.create(MediaType.parse("plain/text"), "error=125&=errorMessage=toto:15");
+        Response okResponse = new Response.Builder().code(200).request(request).protocol(Protocol.HTTP_2).body(body).message("foo").build();
+
+        when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+
+        P24CheckConnectionRequest checkConnectionRequest = new P24CheckConnectionRequest(createContractParametersCheckRequest("a", "a", "a", "a"));
+
+        Map<String, String> errors = new HashMap<>();
+        configurationService.checkHttpConnection(true, checkConnectionRequest, errors, locale);
+
+        Assert.assertEquals(2, errors.size());
+        Assert.assertTrue(errors.keySet().contains(P24Constants.MERCHANT_ID));
+        Assert.assertTrue(errors.keySet().contains(P24Constants.POS_ID));
+    }
+
 
     @Test
     public void checkHttpConnectionWithException() {

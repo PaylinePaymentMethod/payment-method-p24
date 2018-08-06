@@ -1,5 +1,6 @@
 package com.payline.payment.p24.bean.rest;
 
+import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.SecurityManager;
@@ -15,9 +16,15 @@ public class P24VerifyRequest extends P24Request {
     private String orderId;
     private String signature;
 
-    public P24VerifyRequest(RedirectionPaymentRequest redirectionPaymentRequest, String orderId) throws P24ValidationException {
+    /**
+     * @param redirectionPaymentRequest
+     * @param orderId
+     * @throws P24ValidationException
+     */
+    public P24VerifyRequest(RedirectionPaymentRequest redirectionPaymentRequest, String orderId)
+            throws P24ValidationException {
         super(redirectionPaymentRequest);
-
+        validate(redirectionPaymentRequest);
         this.sessionId = redirectionPaymentRequest.getOrder().getReference();
         this.amount = redirectionPaymentRequest.getAmount().getAmountInSmallestUnit().toString();
         this.currency = redirectionPaymentRequest.getAmount().getCurrency().getCurrencyCode();
@@ -43,5 +50,15 @@ public class P24VerifyRequest extends P24Request {
     @Override
     public String createSignature() {
         return (new SecurityManager()).hash(sessionId, orderId, amount, currency, getKey());
+    }
+
+    private void validate(RedirectionPaymentRequest redirectionPaymentRequest) throws P24ValidationException {
+        if (redirectionPaymentRequest.getOrder() == null) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ORDER);
+        }
+
+        if (redirectionPaymentRequest.getAmount() == null) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT);
+        }
     }
 }

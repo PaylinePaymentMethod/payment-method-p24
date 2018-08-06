@@ -13,15 +13,11 @@ import com.payline.pmapi.bean.payment.response.PaymentResponseSuccess;
 import com.payline.pmapi.bean.payment.response.buyerpaymentidentifier.impl.Email;
 import com.payline.pmapi.service.PaymentWithRedirectionService;
 import okhttp3.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
 
 public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirectionService {
-
-    private static final Logger LOG = LogManager.getLogger(PaymentWithRedirectionServiceImpl.class);
 
     private P24HttpClient p24HttpClient;
 

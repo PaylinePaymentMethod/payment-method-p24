@@ -12,7 +12,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.payline.payment.p24.service.ConfigurationServiceImpl.WRONG_MERCHANT_ID;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_MERCHANT_ID;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_POS_ID;
 
 public class P24CheckConnectionRequest extends P24Request {
 
@@ -47,7 +48,7 @@ public class P24CheckConnectionRequest extends P24Request {
         }
         String posId = this.getPosId();
         if (isNotNumeric(posId)) {
-            errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString("contract.posId.wrong", locale));
+            errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString(WRONG_POS_ID, locale));
         }
         return errors;
     }

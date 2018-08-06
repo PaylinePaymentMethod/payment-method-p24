@@ -34,19 +34,17 @@ public class RefundServiceImpl implements RefundService {
      */
     private static SoapErrorCodeEnum getErrorCode(SOAPMessage soapResponseMessage) {
 
-        SoapErrorCodeEnum errorCode;
 
-        if (soapResponseMessage != null) {
+        if (soapResponseMessage == null) {
+            return SoapErrorCodeEnum.UNKNOWN_ERROR;
+        }
 
-            errorCode = SoapErrorCodeEnum.fromP24CodeValue(
-                    SoapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage));
 
-            if (errorCode == null) {
-                errorCode = SoapErrorCodeEnum.UNKNOWN_ERROR;
-            }
+        SoapErrorCodeEnum errorCode = SoapErrorCodeEnum.fromP24CodeValue(
+                SoapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage));
 
-        } else {
-            errorCode = SoapErrorCodeEnum.UNKNOWN_ERROR;
+        if (errorCode == null) {
+            return SoapErrorCodeEnum.UNKNOWN_ERROR;
         }
 
         return errorCode;
