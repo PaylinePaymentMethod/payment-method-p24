@@ -13,7 +13,6 @@ public class RequestUtils {
     private static final Logger LOG = LogManager.getLogger(RequestUtils.class);
 
     // FIXME message
-    private static final String ERR_MESS = "";
 
     private static final String ERR_NO_CONTRACT_PROPERTY = "";
 
@@ -24,7 +23,7 @@ public class RequestUtils {
      */
     public boolean isSandbox(Request request) throws P24ValidationException {
         if (request.getPaylineEnvironment() == null) {
-            throw new P24ValidationException(ERR_MESS);
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT);
         }
         return request.getPaylineEnvironment().isSandbox();
     }
@@ -36,7 +35,7 @@ public class RequestUtils {
      */
     public boolean isSandbox(ContractParametersCheckRequest request) throws P24ValidationException {
         if (request.getPaylineEnvironment() == null) {
-            throw new P24ValidationException(ERR_MESS);
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT);
         }
         return request.getPaylineEnvironment().isSandbox();
     }
@@ -61,6 +60,20 @@ public class RequestUtils {
             throw new P24ValidationException(ERR_NO_CONTRACT_PROPERTY);
         }
         return property.getValue();
+    }
+
+
+    public boolean isNotNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return true;
+        } else {
+            for (int i = 0; i < str.length(); ++i) {
+                if (!Character.isDigit(str.charAt(i))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 }

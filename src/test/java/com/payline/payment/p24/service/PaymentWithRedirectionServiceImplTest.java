@@ -1,6 +1,7 @@
 package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.P24HttpClient;
 import com.payline.payment.p24.utils.P24Path;
 import com.payline.payment.p24.utils.SoapHelper;
@@ -101,6 +102,10 @@ public class PaymentWithRedirectionServiceImplTest {
     public void finalizeRedirectionPaymentSuccess() throws IOException {
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(message);
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
+        when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.ORDER_ID))).thenReturn("orderId");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.EMAIL))).thenReturn("toto@toto.com");
+
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withRedirectionContext("test")
@@ -118,6 +123,7 @@ public class PaymentWithRedirectionServiceImplTest {
     public void finalizeRedirectionPaymentWithHttpError() throws IOException {
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(message);
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(koResponse);
+        when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withRedirectionContext("test")

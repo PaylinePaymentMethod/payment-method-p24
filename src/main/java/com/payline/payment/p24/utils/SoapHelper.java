@@ -97,7 +97,7 @@ public class SoapHelper {
      * @param soapResponseMessage
      * @return String : the error code value
      */
-    public static String getErrorCodeFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
+    public String getErrorCodeFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
         return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG_ERROR_CODE);
     }
 
@@ -107,7 +107,7 @@ public class SoapHelper {
      * @param soapResponseMessage
      * @return String : the error code value
      */
-    public static String getErrorMessageFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
+    public String getErrorMessageFromSoapResponseMessage(SOAPMessage soapResponseMessage) {
         return getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_TAG_ERROR_MESSAGE);
     }
 
@@ -117,7 +117,7 @@ public class SoapHelper {
      * @param soapResponseMessage
      * @return String : the tag content value
      */
-    public static String getTagContentFromSoapResponseMessage(SOAPMessage soapResponseMessage, String tag) {
+    public String getTagContentFromSoapResponseMessage(SOAPMessage soapResponseMessage, String tag) {
 
         String tagContent = "";
 

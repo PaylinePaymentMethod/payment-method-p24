@@ -99,7 +99,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 P24Url.SOAP_ENDPOINT.getUrl(isSandbox));
 
         if (soapResponseMessage != null) {
-            String tag = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
+            String tag = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, "return");
             if (!"true".equals(tag)) {
                 errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
                 errors.put(P24Constants.MERCHANT_MDP, localization.getSafeLocalizedString(WRONG_PASS, locale));

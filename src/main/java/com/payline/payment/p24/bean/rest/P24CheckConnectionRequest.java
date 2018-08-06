@@ -43,28 +43,15 @@ public class P24CheckConnectionRequest extends P24Request {
     public Map<String, String> validateRequest(LocalizationService localization, Locale locale) {
         Map<String, String> errors = new HashMap<>();
         // check all fields values
-        if (isNotNumeric(this.getMerchantId())) {
+        if (super.getRequestUtils().isNotNumeric(this.getMerchantId())) {
             errors.put(P24Constants.MERCHANT_ID, localization.getSafeLocalizedString(WRONG_MERCHANT_ID, locale));
         }
         String posId = this.getPosId();
-        if (isNotNumeric(posId)) {
+        if (super.getRequestUtils().isNotNumeric(posId)) {
             errors.put(P24Constants.POS_ID, localization.getSafeLocalizedString(WRONG_POS_ID, locale));
         }
         return errors;
     }
 
-
-    private boolean isNotNumeric(String str) {
-        if (str == null || str.isEmpty()) {
-            return true;
-        } else {
-            for (int i = 0; i < str.length(); ++i) {
-                if (!Character.isDigit(str.charAt(i))) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
 
 }

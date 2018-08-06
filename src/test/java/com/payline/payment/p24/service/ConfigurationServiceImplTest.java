@@ -210,6 +210,8 @@ public class ConfigurationServiceImplTest {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq("return"))).thenReturn("true");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.EMAIL))).thenReturn("toto@toto.com");
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(goodMerchantId, goodPosId, goodKey, goodPassword);
         Map errors = configurationService.check(request);
@@ -221,6 +223,9 @@ public class ConfigurationServiceImplTest {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(requestUtils.isSandbox(any(com.payline.pmapi.bean.Request.class))).thenReturn(true);
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq("return"))).thenReturn("true");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.EMAIL))).thenReturn("toto@toto.com");
+
 
         ContractParametersCheckRequest request = createContractParametersCheckRequest(notNumericMerchantId, notNumericPosId, goodKey, goodPassword);
         Map errors = configurationService.check(request);

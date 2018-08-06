@@ -38,14 +38,14 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
      * @param soapResponseMessage
      * @return SoapErrorCodeEnum : the error code
      */
-    private static SoapErrorCodeEnum getErrorCode(SOAPMessage soapResponseMessage) {
+    private SoapErrorCodeEnum getErrorCode(SOAPMessage soapResponseMessage) {
 
         SoapErrorCodeEnum errorCode;
 
         if (soapResponseMessage != null) {
 
             errorCode = SoapErrorCodeEnum.fromP24CodeValue(
-                    SoapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage)
+                    soapHelper.getErrorCodeFromSoapResponseMessage(soapResponseMessage)
             );
 
             if (errorCode == null) {
@@ -78,8 +78,8 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
             if (SoapErrorCodeEnum.OK == getErrorCode(soapResponseMessage)) {
 
                 // get needed info for REST request
-                String orderId = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
-                String email = SoapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
+                String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
+                String email = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
 
                 // call trnVerify
                 P24VerifyRequest verifyRequest = new P24VerifyRequest(redirectionPaymentRequest, orderId);

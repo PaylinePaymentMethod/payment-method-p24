@@ -18,6 +18,7 @@ public abstract class P24Request implements Request {
     private String merchantId;
     private String posId;
     private String key;
+
     private RequestUtils requestUtils = new RequestUtils();
 
 
@@ -68,4 +69,8 @@ public abstract class P24Request implements Request {
     public abstract Map<String, String> createBodyMap();
 
     public abstract String createSignature();
+
+    protected RequestUtils getRequestUtils() {
+        return requestUtils;
+    }
 }

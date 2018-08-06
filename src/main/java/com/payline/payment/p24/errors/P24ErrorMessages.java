@@ -18,5 +18,6 @@ public class P24ErrorMessages {
     public static final String MISSING_ORDER = "p24.missing.order";
     public static final String MISSING_AMOUNT = "p24.missing.amount";
     public static final String MISSING_CONTRACT = "p24.missing.contract.configuration";
+    public static final String MISSING_ENVIRONNEMENT = "p24.missing.environment";
 
 }

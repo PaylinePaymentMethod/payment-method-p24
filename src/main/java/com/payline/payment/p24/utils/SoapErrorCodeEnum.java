@@ -55,12 +55,9 @@ public enum SoapErrorCodeEnum {
 
     public static SoapErrorCodeEnum fromP24CodeValue(String text) {
 
-        SoapErrorCodeEnum[] values = values();
-
-        for (int i = 0; i < values.length; i++) {
-            SoapErrorCodeEnum enumValue = values[i];
-            if (enumValue.getP24ErrorCode().equals(text)) {
-                return enumValue;
+        for (SoapErrorCodeEnum soapError : SoapErrorCodeEnum.values()) {
+            if (soapError.getP24ErrorCode().equals(text)) {
+                return soapError;
             }
         }
 

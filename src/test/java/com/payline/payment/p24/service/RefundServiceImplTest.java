@@ -1,6 +1,7 @@
 package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SoapHelper;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
 import com.payline.pmapi.bean.refund.response.RefundResponse;
@@ -11,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.xml.soap.MessageFactory;
@@ -20,6 +20,8 @@ import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RefundServiceImplTest {
@@ -82,7 +84,9 @@ public class RefundServiceImplTest {
 
     @Test
     public void refundRequestOK() {
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageOK);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
+        when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.ORDER_ID))).thenReturn("12");
         RefundRequest paymentRequest = TestUtils.createRefundRequest("2");
 
         RefundResponse response = service.refundRequest(paymentRequest);
@@ -94,7 +98,7 @@ public class RefundServiceImplTest {
     @Test
     public void refundRequestWithSOAPError() {
 
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(null);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(null);
         RefundRequest paymentRequest = TestUtils.createRefundRequest("2");
 
         RefundResponse response = service.refundRequest(paymentRequest);
@@ -107,7 +111,7 @@ public class RefundServiceImplTest {
     @Test
     public void refundRequestKO() {
 
-        when(soapHelper.sendSoapMessage(any(SOAPMessage.class),anyString())).thenReturn(messageKO);
+        when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageKO);
         RefundRequest paymentRequest = TestUtils.createRefundRequest("2");
 
         RefundResponse response = service.refundRequest(paymentRequest);
