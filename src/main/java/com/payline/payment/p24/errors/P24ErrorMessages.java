@@ -16,8 +16,17 @@ public class P24ErrorMessages {
     public static final String TECHNICAL_ERROR = "contract.technicalError";
     public static final String MISSING_PARAMETER = "p24.missing.parameter";
     public static final String MISSING_ORDER = "p24.missing.order";
+    public static final String MISSING_ORDER_REF = "p24.missing.order.reference";
     public static final String MISSING_AMOUNT = "p24.missing.amount";
+    public static final String MISSING_AMOUNT_UNIT = "p24.missing.amount.unit";
+    public static final String MISSING_AMOUNT_CURRENCY = "p24.missing.amount.currency.code";
     public static final String MISSING_CONTRACT = "p24.missing.contract.configuration";
     public static final String MISSING_ENVIRONNEMENT = "p24.missing.environment";
+    public static final String MISSING_RETURN_URL = "p24.missing.environment.returnurl";
+    public static final String MISSING_BUYER = "p24.missing.buyer";
+    public static final String MISSING_ADRESSE = "p24.missing.buyer.adresse";
+    public static final String MISSING_ADRESSE_TYPE = "p24.missing.buyer.adresse.type";
+    public static final String MISSING_ADRESSE_COUNTRY = "p24.missing.buyer.adresse.country";
+    public static final String MISSING_BUYER_EMAIL = "p24.missing.buyer.mail";
 
 }

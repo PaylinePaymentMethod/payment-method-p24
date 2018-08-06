@@ -12,10 +12,6 @@ public class RequestUtils {
 
     private static final Logger LOG = LogManager.getLogger(RequestUtils.class);
 
-    // FIXME message
-
-    private static final String ERR_NO_CONTRACT_PROPERTY = "";
-
     /**
      * @param request ? extends Request
      * @return
@@ -56,24 +52,29 @@ public class RequestUtils {
         }
         ContractProperty property = request.getContractConfiguration().getProperty(key);
         if (property == null) {
-            LOG.error(ERR_NO_CONTRACT_PROPERTY);
-            throw new P24ValidationException(ERR_NO_CONTRACT_PROPERTY);
+            LOG.error("Paramètre obligatoire : %s", key);
+            throw new P24ValidationException(P24ErrorMessages.MISSING_PARAMETER, key);
         }
         return property.getValue();
     }
 
 
     public boolean isNotNumeric(String str) {
-        if (str == null || str.isEmpty()) {
+        if (isEmpty(str)) {
             return true;
-        } else {
-            for (int i = 0; i < str.length(); ++i) {
-                if (!Character.isDigit(str.charAt(i))) {
-                    return true;
-                }
-            }
-            return false;
         }
+
+        for (int i = 0; i < str.length(); ++i) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
     }
 
 }

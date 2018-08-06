@@ -1,6 +1,7 @@
 package com.payline.payment.p24.bean.rest;
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.utils.LocalizationImpl;
 import com.payline.payment.p24.utils.P24Constants;
@@ -14,11 +15,14 @@ import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.payline.payment.p24.bean.TestUtils.CANCEL_URL;
@@ -31,8 +35,26 @@ public class P24RegisterRequestTest {
 
     private static final ContractConfiguration contractConfiguration = TestUtils.createContractConfiguration();
 
+    private Amount amount = new Amount(BigInteger.TEN, Currency.getInstance("EUR"));
+
+    private Browser browser = new Browser("", Locale.FRANCE);
+
+    private Order order = Order.OrderBuilder.anOrder().withReference("REF").build();
+
+    private String mail = "foo@bar.baz";
+    private String phone = "0606060606";
+    private Map<Buyer.AddressType, Buyer.Address> addresses = new HashMap<>();
+    private Map<Buyer.PhoneNumberType, String> phoneNumbers = new HashMap<>();
+
+
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
+
     @Mock
     LocalizationImpl localizationService;
+
+    final String transactionID = "transactionID";
+    final String softDescriptor = "softDescriptor";
 
     @Before
     public void setUp() {
@@ -40,23 +62,289 @@ public class P24RegisterRequestTest {
     }
 
 
-    @Test(expected = P24ValidationException.class)
-    public void ConstructorInvocationWithoutOrder() throws P24ValidationException {
-        PaymentRequest request = TestUtils.createDefaultPaymentRequest();
+    @Test
+    public void ConstructorInvocationWoOrder() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_ORDER);
+
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(null)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .build();
+
         new P24RegisterRequest(request);
     }
 
-    @Test(expected = P24ValidationException.class)
-    public void ConstructorInvocationWithoutAddresses() throws P24ValidationException {
-        PaymentRequest request = createPaymentRequestWithoutAddressRequest();
+
+    @Test
+    public void ConstructorInvocationWoOrderReference() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_ORDER);
+
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(Order.OrderBuilder.anOrder().withReference("").build())
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .build();
+
         new P24RegisterRequest(request);
     }
 
     @Test
-    public void ConstructorInvocationWithWrongCurrency() throws P24ValidationException {
-        PaymentRequest request = createInvalidCurrencyPaymentRequest();
+    public void ConstructorInvocationWoBuyer() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_BUYER);
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(null)
+                .build();
         new P24RegisterRequest(request);
     }
+
+    @Test
+    public void ConstructorInvocationWoMail() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_BUYER);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail("")
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoAddresses() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_BUYER);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoCountry() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_BUYER);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoAmount() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_AMOUNT);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoAmountSmallUnit() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_AMOUNT);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(new Amount(null, Currency.getInstance("EUR")))
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoAmountCurrency() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_AMOUNT);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(new Amount(BigInteger.TEN, null))
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(paylineEnvironment)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoPaylineEnvironment() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_ENVIRONNEMENT);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
+    @Test
+    public void ConstructorInvocationWoRedirectionReturnURL() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_ENVIRONNEMENT);
+        Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
+                .withCountry("country")
+                .build();
+        addresses.put(Buyer.AddressType.DELIVERY, address);
+        addresses.put(Buyer.AddressType.BILLING, address);
+        phoneNumbers.put(Buyer.PhoneNumberType.BILLING, phone);
+        phoneNumbers.put(Buyer.PhoneNumberType.HOME, phone);
+        Buyer buyer = Buyer.BuyerBuilder.aBuyer()
+                .withEmail(mail)
+                .withPhoneNumbers(phoneNumbers)
+                .withAddresses(addresses)
+                .build();
+        PaymentRequest request = PaymentRequest.builder()
+                .withAmount(amount)
+                .withBrowser(browser)
+                .withContractConfiguration(contractConfiguration)
+                .withPaylineEnvironment(new PaylineEnvironment(null, "", CANCEL_URL, true))
+                .withOrder(order)
+                .withTransactionId(transactionID)
+                .withSoftDescriptor(softDescriptor)
+                .withBuyer(buyer)
+                .build();
+        new P24RegisterRequest(request);
+    }
+
 
     @Test
     public void createBodyMap() throws P24ValidationException {
@@ -70,55 +358,6 @@ public class P24RegisterRequestTest {
         Assert.assertNotNull(map);
     }
 
-
-    private static PaymentRequest createInvalidCurrencyPaymentRequest() {
-
-        final Amount amount = TestUtils.createAmount("JPY");
-
-        final String transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
-
-        final Order order = TestUtils.createOrder(transactionID);
-        final String softDescriptor = "softDescriptor";
-        final Locale locale = new Locale("FR");
-
-        Buyer buyer = TestUtils.createDefaultBuyer();
-
-        return PaymentRequest.builder()
-                .withAmount(amount)
-                .withBrowser(new Browser("", locale))
-                .withContractConfiguration(contractConfiguration)
-                .withPaylineEnvironment(paylineEnvironment)
-                .withOrder(order)
-                .withLocale(locale)
-                .withTransactionId(transactionID)
-                .withSoftDescriptor(softDescriptor)
-                .withBuyer(buyer)
-                .build();
-    }
-
-    private static PaymentRequest createPaymentRequestWithoutAddressRequest() {
-        final Amount amount = TestUtils.createAmount("EUR");
-
-        final String transactionID = "transactionID" + Calendar.getInstance().getTimeInMillis();
-
-        final Order order = TestUtils.createOrder(transactionID);
-        final String softDescriptor = "softDescriptor";
-        final Locale locale = new Locale("FR");
-
-        Buyer buyer = TestUtils.createBuyer(TestUtils.createDefaultPhoneNumbers(), TestUtils.createAddresses(null), TestUtils.createFullName());
-
-        return PaymentRequest.builder()
-                .withAmount(amount)
-                .withBrowser(new Browser("", locale))
-                .withContractConfiguration(contractConfiguration)
-                .withPaylineEnvironment(paylineEnvironment)
-                .withOrder(order)
-                .withLocale(locale)
-                .withTransactionId(transactionID)
-                .withSoftDescriptor(softDescriptor)
-                .withBuyer(buyer)
-                .build();
-    }
 
     private static PaymentRequest createPaymentRequestMandatory() {
         final Amount amount = TestUtils.createAmount("EUR");
@@ -134,11 +373,9 @@ public class P24RegisterRequestTest {
 
         return PaymentRequest.builder()
                 .withAmount(amount)
-                .withBrowser(null)
                 .withContractConfiguration(contractConfiguration)
                 .withPaylineEnvironment(paylineEnvironment)
                 .withOrder(order)
-                .withLocale(null)
                 .withTransactionId(transactionID)
                 .withBuyer(buyer)
                 .build();

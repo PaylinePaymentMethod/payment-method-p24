@@ -1,19 +1,27 @@
 package com.payline.payment.p24.bean.rest;
 
+import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.service.enums.ChannelKeys;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
+import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.ContractProperty;
+import com.payline.pmapi.bean.payment.Order;
+import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class P24RegisterRequest extends P24Request {
+
+    private static final Logger LOG = LogManager.getLogger(P24RegisterRequest.class);
 
     // mandatory fields
     private String sessionId;
@@ -45,38 +53,23 @@ public class P24RegisterRequest extends P24Request {
     public P24RegisterRequest(PaymentRequest paymentRequest) throws P24ValidationException {
         super(paymentRequest);
 
-        Buyer buyer = paymentRequest.getBuyer();
-        if (buyer == null) {
-            throw new P24ValidationException("buyer is mandatory but not provided");
-        }
-        // FIXME GET OR GETFORTYPE
-        if (buyer.getAddresses() == null || buyer.getAddresses().get(Buyer.AddressType.BILLING) == null) {
-            throw new P24ValidationException("buyer address is mandatory but not provided");
-        }
-        Buyer.Address buyerAddress = buyer.getAddresses().get(Buyer.AddressType.BILLING);
-
         // mandatory fields
-        this.sessionId = paymentRequest.getOrder().getReference();
-        this.amount = paymentRequest.getAmount().getAmountInSmallestUnit().toString();
+        Amount amountObj = paymentRequest.getAmount();
+        validateAmount(amountObj);
+        this.amount = amountObj.getAmountInSmallestUnit().toString();
+        this.currency = amountObj.getCurrency().getCurrencyCode();
 
-        if (paymentRequest.getAmount().getCurrency().getCurrencyCode() == null) {
-            // FIXME : ask CAA
-            throw new P24ValidationException("bad currency code (PLN, EUR, GBP, CZK");
-        }
-        this.currency = paymentRequest.getAmount().getCurrency().getCurrencyCode();
-
+        this.sessionId = getOrderReference(paymentRequest);
         this.description = this.sessionId;
+
+        Buyer buyer = paymentRequest.getBuyer();
+        validateBuyer(buyer);
         this.email = buyer.getEmail();
+        Buyer.Address buyerAddress = getBuyerAdresse(buyer);
+        this.country = buyerAddress.getCountry();
 
-        if (buyerAddress.getCountry() == null) {
-            throw new P24ValidationException("country is mandatory but not provided");
-        }
-        this.country = buyer.getAddressForType(Buyer.AddressType.BILLING).getCountry();
 
-        if (paymentRequest.getPaylineEnvironment().getRedirectionReturnURL() == null) {
-            throw new P24ValidationException("redirectionURL is mandatory but not provided");
-        }
-        this.urlReturn = paymentRequest.getPaylineEnvironment().getRedirectionReturnURL();
+        this.urlReturn = getRedirectionReturnURL(paymentRequest);
         this.signature = createSignature();
 
 
@@ -97,25 +90,30 @@ public class P24RegisterRequest extends P24Request {
         }
 
         this.urlStatus = paymentRequest.getPaylineEnvironment().getNotificationURL();
-//        this.shipping = "0";    // FIXME attendre l'évolution de l'APM API => this.shipping = paymentRequest.getOrder().getDeliveryCharge().getAmountInSmallUnit().toString();
+
+        /**
+         * FIXME attendre l'évolution de l'APM API =>
+         * this.shipping = paymentRequest.getOrder().getDeliveryCharge().getAmountInSmallUnit().toString();
+         */
+
         this.transferLabel = paymentRequest.getSoftDescriptor();
         this.channel = evaluateChannel(paymentRequest.getContractConfiguration());
     }
 
     private String evaluateChannel(ContractConfiguration contractConfiguration) {
-        int channel = 0;
+        int calculatedChannel = 0;
         for (ChannelKeys channelKey : ChannelKeys.values()) {
 
             ContractProperty contractProperty = contractConfiguration.getProperty(channelKey.getKey());
             if (contractProperty != null && Boolean.valueOf(contractProperty.getValue())) {
-                channel += channelKey.getValue();
+                calculatedChannel += channelKey.getValue();
             }
         }
         // if no channel selected set default value to 63 (00111111)
-        if (channel == 0) {
-            channel = 63;
+        if (calculatedChannel == 0) {
+            calculatedChannel = 63;
         }
-        return String.valueOf(channel);
+        return String.valueOf(calculatedChannel);
     }
 
     /**
@@ -179,6 +177,60 @@ public class P24RegisterRequest extends P24Request {
     @Override
     public String createSignature() {
         return (new SecurityManager()).hash(sessionId, getMerchantId(), amount, currency, getKey());
+    }
+
+
+    private Buyer.Address getBuyerAdresse(Buyer buyer) throws P24ValidationException {
+
+        if (buyer == null || buyer.getAddresses() == null || buyer.getAddresses().isEmpty()) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_ADRESSE_TYPE);
+        }
+        Buyer.Address addr = buyer.getAddressForType(Buyer.AddressType.BILLING);
+        if (addr == null || super.getRequestUtils().isEmpty(addr.getCountry())) {
+
+            throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_ADRESSE_COUNTRY);
+        }
+        return addr;
+
+    }
+
+    private void validateBuyer(Buyer buyer) throws P24ValidationException {
+
+        if (buyer == null || super.getRequestUtils().isEmpty(buyer.getEmail())) {
+            LOG.error("Invalid data : buyer's mail is mandatory");
+            throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_BUYER_EMAIL);
+        }
+    }
+
+    private void validateAmount(Amount amount) throws P24ValidationException {
+
+        if (amount == null || amount.getAmountInSmallestUnit() == null) {
+            LOG.error("Invalid data : amount in smallest unit is mandatory");
+            throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT, P24ErrorMessages.MISSING_AMOUNT_UNIT);
+        }
+
+        if (amount.getCurrency() == null || amount.getCurrency().getCurrencyCode() == null) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT, P24ErrorMessages.MISSING_AMOUNT_CURRENCY);
+        }
+    }
+
+    private String getRedirectionReturnURL(PaymentRequest paymentRequest) throws P24ValidationException {
+        PaylineEnvironment paylineEnvironment = paymentRequest.getPaylineEnvironment();
+        if (paylineEnvironment == null
+                || super.getRequestUtils().isEmpty(paylineEnvironment.getRedirectionReturnURL())) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT, P24ErrorMessages.MISSING_RETURN_URL);
+        }
+
+        return paylineEnvironment.getRedirectionReturnURL();
+    }
+
+    private String getOrderReference(PaymentRequest paymentRequest) throws P24ValidationException {
+        Order order = paymentRequest.getOrder();
+        if (order == null || super.getRequestUtils().isEmpty(order.getReference())) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ORDER, P24ErrorMessages.MISSING_ORDER_REF);
+        }
+
+        return order.getReference();
     }
 
 }
