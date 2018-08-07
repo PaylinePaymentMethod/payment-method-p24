@@ -1,0 +1,1 @@
+Payment method PRZELEWY24
