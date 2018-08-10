@@ -7,7 +7,7 @@ apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
 description = 'payment-method-p24'
-group 'com.payline.payment.p24'
+group 'com.payline'
 version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
