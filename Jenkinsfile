@@ -103,14 +103,13 @@ pipeline {
             }
         }
         //stage ('Tag Git') {
-            //On arrive pas tag depuis le gitlab
-	    //when {
-            //    anyOf { branch 'master'; branch 'develop'; branch "release/*" }
-            //}
-            //steps {
-             //   sh "git tag -f V${versionInGradle}"
-             //   sh "git push origin -f V${versionInGradle}"
-            //}
-       // }
+          // when {
+          //      anyOf { branch 'master'; branch 'develop'; branch "release/*" }
+           // }
+           // steps {
+           //     sh "git tag -f V${versionInGradle}"
+           //     sh "git push origin -f V${versionInGradle}"
+           // }
+        //}
     }
 }
