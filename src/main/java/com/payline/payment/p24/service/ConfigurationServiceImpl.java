@@ -24,7 +24,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private static final String LABEL = ".label";
     private static final String DESCRIPTION = ".description";
     private static final String VERSION = "1.0";
-    private static final String RELEASE_DATE = "12/12/2012";
+    private static final String RELEASE_DATE = "01/09/1018";
 
 
     private LocalizationService localization;
@@ -132,7 +132,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(merchantPos);
 
         // key shared between the merchant and P24
-        final InputParameter merchantKey = new InputParameter();
+//        final InputParameter merchantKey = new InputParameter();
+        final PasswordParameter merchantKey = new PasswordParameter();
         merchantKey.setKey(P24Constants.MERCHANT_KEY);
         merchantKey.setLabel(localization.getSafeLocalizedString("contract.merchantKey.label", locale));
         merchantKey.setDescription(localization.getSafeLocalizedString("contract.merchantKey.description", locale));

@@ -129,12 +129,12 @@ public class RefundServiceImpl implements RefundService {
 
     @Override
     public boolean canMultiple() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canPartial() {
-        return false;
+        return true;
     }
 
 
