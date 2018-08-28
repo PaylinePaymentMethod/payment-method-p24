@@ -27,6 +27,9 @@ public abstract class P24Request implements Request {
         this.paylineEnvironment = paymentRequest.getPaylineEnvironment();
         this.merchantId = requestUtils.getContractValue(paymentRequest, P24Constants.MERCHANT_ID);
         this.posId = requestUtils.getContractValue(paymentRequest, P24Constants.POS_ID);
+        if (posId == null || posId.length() == 0) {
+            posId = this.getMerchantId();
+        }
         this.key = requestUtils.getContractValue(paymentRequest, P24Constants.MERCHANT_KEY);
     }
 
