@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.xml.soap.SOAPMessage;
+import java.util.Calendar;
 
 public class RefundServiceImpl implements RefundService {
 
@@ -59,7 +60,7 @@ public class RefundServiceImpl implements RefundService {
 
     @Override
     public RefundResponse refundRequest(RefundRequest refundRequest) {
-        String transactionId = refundRequest.getTransactionId();
+        int batch = (int) Calendar.getInstance().getTimeInMillis();
         try {
             SOAPMessage soapResponseMessage = null;
             SoapErrorCodeEnum errorCode = null;
@@ -83,7 +84,7 @@ public class RefundServiceImpl implements RefundService {
 
             // ... continue if last ws errorCode = 0
             if (SoapErrorCodeEnum.OK != errorCode) {
-                return getRefundResponseFailure(errorCode.getP24ErrorCode(), FailureCause.INVALID_DATA, transactionId);
+                return getRefundResponseFailure(errorCode.getP24ErrorCode(), FailureCause.INVALID_DATA, refundRequest.getTransactionId());
             }
 
 
@@ -92,14 +93,14 @@ public class RefundServiceImpl implements RefundService {
 
             if (requestUtils.isNotNumeric(trnBySessionIdOrderIdValue)) {
                 LOG.error("Invalid data : trnBySessionIdOrderIdValue is not numeric");
-                return getRefundResponseFailure(null, FailureCause.INVALID_DATA, transactionId);
+                return getRefundResponseFailure(null, FailureCause.INVALID_DATA, refundRequest.getTransactionId());
             }
 
             // Call P24.trnRefund
             P24TrnRefundRequest p24TrnRefundRequest = new P24TrnRefundRequest()
                     .login(merchantId)
                     .pass(password)
-                    .batch(Integer.valueOf(transactionId))
+                    .batch(batch)
                     .orderId(Integer.valueOf(trnBySessionIdOrderIdValue))
                     .sessionId(sessionId)
                     .amount(amount);
@@ -115,15 +116,15 @@ public class RefundServiceImpl implements RefundService {
             if (SoapErrorCodeEnum.OK == errorCode) {
                 return RefundResponseSuccess.RefundResponseSuccessBuilder.aRefundResponseSuccess()
                         .withStatusCode("0")
-                        .withTransactionId(transactionId)
+                        .withTransactionId(String.valueOf(batch))
                         .build();
 
             } else {
-                return getRefundResponseFailure(errorCode.getP24ErrorCode(), FailureCause.INTERNAL_ERROR, transactionId);
+                return getRefundResponseFailure(errorCode.getP24ErrorCode(), FailureCause.INTERNAL_ERROR, refundRequest.getTransactionId());
             }
 
         } catch (P24ValidationException e) {
-            return getRefundResponseFailure(null, FailureCause.INVALID_DATA, transactionId);
+            return getRefundResponseFailure(null, FailureCause.INVALID_DATA, refundRequest.getTransactionId());
         }
     }
 
@@ -161,11 +162,11 @@ public class RefundServiceImpl implements RefundService {
             throw new P24ValidationException(err);
 
         }
-        if (requestUtils.isNotNumeric(refundRequest.getTransactionId())) {
-            String err = "Invalid data : trnBySessionIdOrderIdValue is not numeric";
-            LOG.error(err);
-            throw new P24ValidationException(err);
-        }
+//        if (requestUtils.isNotNumeric(refundRequest.getTransactionId())) {
+//            String err = "Invalid data : trnBySessionIdOrderIdValue is not numeric";
+//            LOG.error(err);
+//            throw new P24ValidationException(err);
+//        }
 
     }
 }

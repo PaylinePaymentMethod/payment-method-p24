@@ -87,7 +87,7 @@ public class RefundServiceImplTest {
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(messageOK);
         when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
         when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.ORDER_ID))).thenReturn("12");
-        RefundRequest paymentRequest = TestUtils.createRefundRequest("2");
+        RefundRequest paymentRequest = TestUtils.createRefundRequest("dumbId");
 
         RefundResponse response = service.refundRequest(paymentRequest);
 
