@@ -267,12 +267,9 @@ public class ConfigurationServiceImplTest {
 
     @Test
     public void getReleaseInformation() {
-        String version = "1.0";
-        String date = "2012-12-12";
-
         ReleaseInformation releaseInformation = configurationService.getReleaseInformation();
-        Assert.assertEquals(version, releaseInformation.getVersion());
-        Assert.assertEquals(date, releaseInformation.getDate().toString());
+        Assert.assertNotNull( releaseInformation.getVersion());
+        Assert.assertNotNull(releaseInformation.getDate());
     }
 
 
