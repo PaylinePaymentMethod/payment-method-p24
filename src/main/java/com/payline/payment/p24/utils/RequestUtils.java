@@ -3,7 +3,7 @@ package com.payline.payment.p24.utils;
 import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.pmapi.bean.Request;
-import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

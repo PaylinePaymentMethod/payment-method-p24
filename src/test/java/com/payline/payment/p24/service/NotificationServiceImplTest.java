@@ -10,6 +10,9 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
+import java.io.ByteArrayInputStream;
+import java.util.Collections;
+
 public class NotificationServiceImplTest {
 
     @InjectMocks
@@ -30,8 +33,13 @@ public class NotificationServiceImplTest {
 
     @Test
     public void parse_notNull() {
-        NotificationResponse reponse = notificationService.parse(
-                new NotificationRequest("", "", null, null));
+        final NotificationRequest notificationRequest = NotificationRequest.NotificationRequestBuilder.aNotificationRequest()
+                .withHttpMethod("POST")
+                .withPathInfo("/path")
+                .withContent(new ByteArrayInputStream("".getBytes()))
+                .withHeaderInfos(Collections.emptyMap())
+                .build();
+        NotificationResponse reponse = notificationService.parse(notificationRequest);
         Assert.assertNotNull(reponse);
         Assert.assertEquals(IgnoreNotificationResponse.class, reponse.getClass());
     }

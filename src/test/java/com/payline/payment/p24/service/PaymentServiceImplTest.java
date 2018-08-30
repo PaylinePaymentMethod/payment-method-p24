@@ -8,7 +8,8 @@ import com.payline.payment.p24.utils.RequestUtils;
 import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
-import com.payline.pmapi.bean.payment.response.PaymentResponseFailure;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect;
 import com.payline.pmapi.service.PaymentService;
 import okhttp3.*;
 import org.junit.Assert;
@@ -101,7 +102,7 @@ public class PaymentServiceImplTest {
 
         PaymentResponse response = paymentService.paymentRequest(paymentRequest);
         Assert.assertNotNull(response);
-        Assert.assertEquals(com.payline.pmapi.bean.payment.response.PaymentResponseRedirect.class, response.getClass());
+        Assert.assertEquals(PaymentResponseRedirect.class, response.getClass());
 
     }
 

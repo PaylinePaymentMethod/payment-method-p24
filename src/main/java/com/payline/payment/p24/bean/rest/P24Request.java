@@ -4,7 +4,7 @@ import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.RequestUtils;
 import com.payline.pmapi.bean.Request;
-import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;

@@ -5,9 +5,9 @@
 //import com.payline.pmapi.bean.payment.request.PaymentRequest;
 //import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
 //import com.payline.pmapi.bean.payment.response.PaymentResponse;
-//import com.payline.pmapi.bean.payment.response.PaymentResponseFailure;
-//import com.payline.pmapi.bean.payment.response.PaymentResponseRedirect;
-//import com.payline.pmapi.bean.payment.response.PaymentResponseSuccess;
+//import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
+//import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect;
+//import com.payline.pmapi.bean.payment.response.impl.PaymentResponseSuccess;
 //import com.payline.pmapi.service.PaymentService;
 //import com.payline.pmapi.service.PaymentWithRedirectionService;
 //import org.junit.jupiter.api.Assertions;

@@ -5,7 +5,7 @@ import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.LocalizationService;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
-import com.payline.pmapi.bean.configuration.ContractParametersCheckRequest;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 
 import java.util.HashMap;

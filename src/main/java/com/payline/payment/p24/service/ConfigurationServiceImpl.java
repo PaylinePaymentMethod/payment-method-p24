@@ -6,6 +6,11 @@ import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.service.enums.ChannelKeys;
 import com.payline.payment.p24.utils.*;
 import com.payline.pmapi.bean.configuration.*;
+import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
+import com.payline.pmapi.bean.configuration.parameter.impl.InputParameter;
+import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
+import com.payline.pmapi.bean.configuration.parameter.impl.PasswordParameter;
+import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.service.ConfigurationService;
 import okhttp3.Response;
 
