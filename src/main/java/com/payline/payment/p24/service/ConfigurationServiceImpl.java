@@ -141,7 +141,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(merchantKey);
 
         // P24 password of the merchant
-        final InputParameter merchantPassword = new InputParameter();
+        final PasswordParameter merchantPassword = new PasswordParameter();
         merchantPassword.setKey(P24Constants.MERCHANT_MDP);
         merchantPassword.setLabel(localization.getSafeLocalizedString("contract.merchantPassword.label", locale));
         merchantPassword.setDescription(localization.getSafeLocalizedString("contract.merchantPassword.description", locale));
