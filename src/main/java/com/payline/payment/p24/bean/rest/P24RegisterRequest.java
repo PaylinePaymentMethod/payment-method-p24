@@ -186,8 +186,7 @@ public class P24RegisterRequest extends P24Request {
             throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_ADRESSE_TYPE);
         }
         Buyer.Address addr = buyer.getAddressForType(Buyer.AddressType.BILLING);
-        if (addr == null || super.getRequestUtils().isEmpty(addr.getCountry())) {
-
+        if (addr == null) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_ADRESSE_COUNTRY);
         }
         return addr;
