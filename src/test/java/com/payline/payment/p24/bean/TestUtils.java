@@ -55,7 +55,6 @@ public class TestUtils {
         final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
 //        final String transactionID = createTransactionId();
         final Amount amount = createAmount("EUR");
-        final Map<String, Map> partnerConfiguration = new HashMap<>();
         return RefundRequest.RefundRequestBuilder.aRefundRequest()
                 .withAmount(amount)
                 .withOrder(createOrder(transactionId, amount))
@@ -64,7 +63,7 @@ public class TestUtils {
                 .withPaylineEnvironment(paylineEnvironment)
                 .withTransactionId(transactionId)
                 .withPartnerTransactionId("toto")
-                .withPartnerConfiguration(new PartnerConfiguration(partnerConfiguration))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
     }
 

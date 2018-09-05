@@ -234,7 +234,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
                 .withPartnerTransactionId(transactionID)
                 .withPaylineEnvironment(paylineEnvironment)
                 .withContractConfiguration(contractConfiguration)
-                .withPartnerConfiguration(new PartnerConfiguration(null))
+                .withPartnerConfiguration(new PartnerConfiguration(null, null))
                 .withBuyer(buyer)
                 .withOrder(refundOrder)
                 .build();

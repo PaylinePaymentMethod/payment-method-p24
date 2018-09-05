@@ -283,7 +283,7 @@ public class ConfigurationServiceImplTest {
 
         ContractConfiguration configuration = new ContractConfiguration("test", null);
         PaylineEnvironment environment = new PaylineEnvironment("notificationURL", "redirectionURL", "redirectionCancelURL", true);
-        PartnerConfiguration partnerConfiguration = new PartnerConfiguration(new HashMap<>());
+        PartnerConfiguration partnerConfiguration = new PartnerConfiguration(new HashMap<>(), new HashMap<>());
 
         return CheckRequestBuilder.aCheckRequest()
                 .withAccountInfo(accountInfo)
