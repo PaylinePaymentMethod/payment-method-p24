@@ -64,6 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
 
                     return PaymentResponseRedirectBuilder.aPaymentResponseRedirect()
                             .withRedirectionRequest(redirectionRequest)
+                            .withTransactionIdentifier(paymentRequest.getTransactionId())
                             .build();
                 }
                 // one or more errors
