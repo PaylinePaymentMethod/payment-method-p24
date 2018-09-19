@@ -59,8 +59,8 @@ public class P24RegisterRequest extends P24Request {
         this.amount = amountObj.getAmountInSmallestUnit().toString();
         this.currency = amountObj.getCurrency().getCurrencyCode();
 
-        this.sessionId = getOrderReference(paymentRequest);
-        this.description = this.sessionId;
+        this.sessionId = paymentRequest.getTransactionId();
+        this.description = getOrderReference(paymentRequest);
 
         Buyer buyer = paymentRequest.getBuyer();
         validateBuyer(buyer);
