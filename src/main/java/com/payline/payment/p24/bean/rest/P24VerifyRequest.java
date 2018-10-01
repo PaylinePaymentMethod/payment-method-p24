@@ -5,6 +5,7 @@ import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.SecurityManager;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
+import com.payline.pmapi.bean.payment.request.TransactionStatusRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +26,22 @@ public class P24VerifyRequest extends P24Request {
             throws P24ValidationException {
         super(redirectionPaymentRequest);
         validate(redirectionPaymentRequest);
-        this.sessionId = redirectionPaymentRequest.getOrder().getReference();
+        this.sessionId = redirectionPaymentRequest.getTransactionId();
         this.amount = redirectionPaymentRequest.getAmount().getAmountInSmallestUnit().toString();
         this.currency = redirectionPaymentRequest.getAmount().getCurrency().getCurrencyCode();
         this.orderId = orderId;
         this.signature = createSignature();
 
+    }
+
+    public P24VerifyRequest(TransactionStatusRequest transactionStatusRequest, String orderId) throws P24ValidationException {
+        super(transactionStatusRequest);
+        validate(transactionStatusRequest);
+        this.sessionId = transactionStatusRequest.getTransactionIdentifier();
+        this.amount = transactionStatusRequest.getAmount().getAmountInSmallestUnit().toString();
+        this.currency = transactionStatusRequest.getAmount().getCurrency().getCurrencyCode();
+        this.orderId = orderId;
+        this.signature = createSignature();
     }
 
     @Override
@@ -53,11 +64,21 @@ public class P24VerifyRequest extends P24Request {
     }
 
     private void validate(RedirectionPaymentRequest redirectionPaymentRequest) throws P24ValidationException {
-        if (redirectionPaymentRequest.getOrder() == null) {
+        /*if (redirectionPaymentRequest.getOrder() == null) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_ORDER);
+        }
+*/
+        if (redirectionPaymentRequest.getAmount() == null) {
+            throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT);
+        }
+    }
+
+    private void validate(TransactionStatusRequest transactionStatusRequest) throws P24ValidationException {
+        if (transactionStatusRequest.getOrder() == null) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_ORDER);
         }
 
-        if (redirectionPaymentRequest.getAmount() == null) {
+        if (transactionStatusRequest.getAmount() == null) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT);
         }
     }

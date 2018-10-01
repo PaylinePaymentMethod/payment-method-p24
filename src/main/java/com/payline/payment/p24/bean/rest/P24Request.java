@@ -8,6 +8,7 @@ import com.payline.pmapi.bean.configuration.request.ContractParametersCheckReque
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.request.TransactionStatusRequest;
 
 import java.util.Map;
 
@@ -45,6 +46,21 @@ public abstract class P24Request implements Request {
             posId = this.getMerchantId();
         }
         this.key = accountInfo.get(P24Constants.MERCHANT_KEY);
+    }
+
+    public P24Request(TransactionStatusRequest transactionStatusRequest) {
+        this.contractConfiguration = transactionStatusRequest.getContractConfiguration();
+        this.paylineEnvironment = transactionStatusRequest.getPaylineEnvironment();
+
+        // get all fields to check
+        final ContractConfiguration configuration = transactionStatusRequest.getContractConfiguration();
+
+        this.merchantId = configuration.getProperty(P24Constants.MERCHANT_ID).getValue();
+        this.posId = configuration.getProperty(P24Constants.POS_ID).getValue();
+        if (posId == null || posId.length() == 0) {
+            posId = this.getMerchantId();
+        }
+        this.key = configuration.getProperty(P24Constants.MERCHANT_KEY).getValue();
     }
 
     public String getMerchantId() {
