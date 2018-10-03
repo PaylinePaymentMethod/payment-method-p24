@@ -17,7 +17,6 @@ import java.util.Map;
 
 public class P24VerifyRequestTest {
 
-
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
@@ -35,17 +34,6 @@ public class P24VerifyRequestTest {
         expectedEx.expect(P24ValidationException.class);
         expectedEx.expectMessage(P24ErrorMessages.MISSING_CONTRACT);
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder().build();
-        new P24VerifyRequest(redirectionPaymentRequest, null);
-    }
-
-    @Test
-    public void ConstructorInvocationWithoutOrder() throws P24ValidationException {
-        expectedEx.expect(P24ValidationException.class);
-        expectedEx.expectMessage(P24ErrorMessages.MISSING_ORDER);
-        RedirectionPaymentRequest redirectionPaymentRequest =
-                RedirectionPaymentRequest.builder()
-                        .withContractConfiguration(TestUtils.createContractConfiguration())
-                        .build();
         new P24VerifyRequest(redirectionPaymentRequest, null);
     }
 

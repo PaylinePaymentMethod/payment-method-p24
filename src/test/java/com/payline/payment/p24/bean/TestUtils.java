@@ -9,7 +9,14 @@ import com.payline.pmapi.bean.payment.*;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
 import com.payline.pmapi.bean.refund.request.RefundRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseFactory;
+import org.apache.http.HttpVersion;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.message.BasicStatusLine;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -73,6 +80,25 @@ public class TestUtils {
 
         return request;
     }
+
+    public static HttpResponse createResponse(int code, String body) {
+        HttpResponseFactory factory = new DefaultHttpResponseFactory();
+        HttpResponse response = factory.newHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, code, null), null);
+        BasicHttpEntity entity = new BasicHttpEntity();
+        entity.setContent(new ByteArrayInputStream(body.getBytes()));
+        response.setEntity(entity);
+
+        return response;
+    }
+
+    public static HttpResponse createResponseOK() {
+        return createResponse(200, "error=0");
+    }
+
+    public static HttpResponse createResponseKO() {
+        return createResponse(200, "error=err00&errorMessage=Błąd wywołania (1)");
+    }
+
 
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount("PLN");
