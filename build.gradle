@@ -8,12 +8,13 @@ apply plugin: 'jacoco'
 
 description = 'payment-method-p24'
 group 'com.payline.payment.p24'
-version '1.0'
+version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 ext {
-    paymentMethodVersion = '0.11'
+    paymentMethodVersion = '1.0-SNAPSHOT'
+    integrationVersion = '1.0-SNAPSHOT'
     powerMockVersion = '1.7.0'
     releaseDirectoryPath = 'D:/build'
 }
@@ -47,6 +48,7 @@ dependencies {
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.13.0'
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.13.0'
     testImplementation "com.payline:payment-method-api:${paymentMethodVersion}"
+    testImplementation "com.payline:payment-method-integration:${integrationVersion}"
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.3'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.3'
@@ -90,27 +92,28 @@ publishing {
 
 repositories {
     mavenLocal()
-    maven {
-        url "https://nexus.intra.monext.fr:10130/nexus/content/repositories/jindus-repo-pay-pay-public/"
-        credentials {
-            username mavenUser
-            password mavenPassword
-        }
-    }
-    maven {
-        url "https://nexus.intra.monext.fr:10130/nexus/content/groups/public"
-        credentials {
-            username mavenUser
-            password mavenPassword
-        }
-    }
-    maven {
-        url "https://nexus.intra.monext.fr:10130/nexus/content/repositories/jindus-repo-pay-pay-snapshot/"
-        credentials {
-            username mavenUser
-            password mavenPassword
-        }
-    }
+    mavenCentral()
+//    maven {
+//        url "https://nexus.intra.monext.fr:10130/nexus/content/repositories/jindus-repo-pay-pay-public/"
+//        credentials {
+//            username mavenUser
+//            password mavenPassword
+//        }
+//    }
+//    maven {
+//        url "https://nexus.intra.monext.fr:10130/nexus/content/groups/public"
+//        credentials {
+//            username mavenUser
+//            password mavenPassword
+//        }
+//    }
+//    maven {
+//        url "https://nexus.intra.monext.fr:10130/nexus/content/repositories/jindus-repo-pay-pay-snapshot/"
+//        credentials {
+//            username mavenUser
+//            password mavenPassword
+//        }
+//    }
 }
 
 

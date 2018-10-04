@@ -1,6 +1,9 @@
 package com.payline.payment.p24.service;
 
 
+import com.payline.payment.p24.bean.TestUtils;
+import com.payline.pmapi.bean.configuration.PartnerConfiguration;
+import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
@@ -16,10 +19,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Locale;
 
 import static org.mockito.Mockito.mock;
@@ -41,9 +42,9 @@ public class PaymentFormConfigurationServiceImplTest {
     }
 
     @Test
-    public void testGetLogo() throws IOException {
+    public void testGetLogo(){
         // when: getLogo is called
-        PaymentFormLogo paymentFormLogo = service.getLogo(Locale.getDefault());
+        PaymentFormLogo paymentFormLogo = service.getLogo("",Locale.getDefault());
 
         // then: returned elements are not null
         Assert.assertNotNull(paymentFormLogo);
@@ -57,18 +58,19 @@ public class PaymentFormConfigurationServiceImplTest {
         String filename = "p24-logo.png";
         InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream(filename);
         BufferedImage image = ImageIO.read(input);
-        String guessedContentType = Files.probeContentType(new File(filename).toPath());
 
         // when: getPaymentFormLogo is called
         PaymentFormLogoRequest request = PaymentFormLogoRequest.PaymentFormLogoRequestBuilder.aPaymentFormLogoRequest()
                 .withLocale(Locale.getDefault())
+                .withContractConfiguration(TestUtils.createContractConfiguration())
+                .withPartnerConfiguration(new PartnerConfiguration(null, null))
+                .withPaylineEnvironment(new PaylineEnvironment("","","",true))
                 .build();
         PaymentFormLogoResponse paymentFormLogoResponse = service.getPaymentFormLogo(request);
 
         // then: returned elements match the image file data
         Assert.assertTrue(paymentFormLogoResponse instanceof PaymentFormLogoResponseFile);
         PaymentFormLogoResponseFile casted = (PaymentFormLogoResponseFile) paymentFormLogoResponse;
-        Assert.assertEquals(guessedContentType, casted.getContentType());
         Assert.assertEquals(image.getHeight(), casted.getHeight());
         Assert.assertEquals(image.getWidth(), casted.getWidth());
         Assert.assertNotNull(casted.getTitle());

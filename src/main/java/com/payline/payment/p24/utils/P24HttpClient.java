@@ -1,26 +1,33 @@
 package com.payline.payment.p24.utils;
 
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class P24HttpClient extends AbstractHttpClient {
+    private static final String CONTENT_TYPE_KEY = "Content-Type";
+    private static final String P24_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
-    public static final String P24_CONTENT_TYPE = "application/x-www-form-urlencoded";
+    public HttpResponse doPost(String host, P24Path path, Map<String, String> body) throws IOException, URISyntaxException {
+        ArrayList<NameValuePair> parameters = new ArrayList<>();
+        for (Map.Entry<String, String> entry : body.entrySet()) {
+            parameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
+        UrlEncodedFormEntity urlEncodedBody = new UrlEncodedFormEntity(parameters);
+        InputStreamEntity entity = new InputStreamEntity(urlEncodedBody.getContent());
 
-    /**
-     * Default constructor
-     */
-    public P24HttpClient() throws GeneralSecurityException {
+        Header[] headers = new Header[1];
+        headers[0] = new BasicHeader(CONTENT_TYPE_KEY, P24_CONTENT_TYPE);
+
+        return super.doPost(P24Constants.SCHEME, host, path.getPath(), headers, entity);
     }
-
-
-    public Response doPost(String host, P24Path path, Map<String, String> body) throws IOException {
-        RequestBody requestBody = new MltiPartRequestBodyBuilder().withFormData(body).build();
-        return super.doPost(P24Constants.SCHEME, host, path.getPath(), requestBody, P24_CONTENT_TYPE);
-    }
-
 }

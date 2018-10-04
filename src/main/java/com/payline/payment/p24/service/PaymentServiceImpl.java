@@ -8,8 +8,10 @@ import com.payline.pmapi.bean.common.FailureCause;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
-import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect.PaymentResponseRedirectBuilder;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect.RedirectionRequest;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect.PaymentResponseRedirectBuilder;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect.RedirectionRequest.RedirectionRequestBuilder;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect.RedirectionRequest.RequestType;
 import com.payline.pmapi.service.PaymentService;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -17,7 +19,6 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -27,7 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private RequestUtils requestUtils;
 
-    public PaymentServiceImpl() throws GeneralSecurityException {
+    public PaymentServiceImpl() {
         p24HttpClient = new P24HttpClient();
         requestUtils = new RequestUtils();
     }
@@ -58,9 +59,11 @@ public class PaymentServiceImpl implements PaymentService {
                     String token = t.group(1);
 
                     // create url from the token
-                    URL checkOutUrl = new URL(
-                            P24Constants.SCHEME, P24Url.REST_HOST.getUrl(isSandbox), P24Path.REQUEST.getPath() + token);
-                    RedirectionRequest redirectionRequest = new RedirectionRequest(checkOutUrl);
+                    URL checkOutUrl = new URL(P24Constants.SCHEME, P24Url.REST_HOST.getUrl(isSandbox), P24Path.REQUEST.getPath() + token);
+                    RedirectionRequest redirectionRequest = RedirectionRequestBuilder.aRedirectionRequest()
+                            .withRequestType(RequestType.GET)
+                            .withUrl(checkOutUrl)
+                            .build();
 
                     return PaymentResponseRedirectBuilder.aPaymentResponseRedirect()
                             .withRedirectionRequest(redirectionRequest)

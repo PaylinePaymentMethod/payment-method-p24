@@ -11,7 +11,6 @@ import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseRedirect;
 import com.payline.pmapi.service.PaymentService;
-import okhttp3.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.net.URISyntaxException;
 
 public class PaymentServiceImplTest {
 
@@ -34,9 +33,6 @@ public class PaymentServiceImplTest {
     @Mock
     private RequestUtils requestUtils;
 
-    public PaymentServiceImplTest() throws GeneralSecurityException {
-    }
-
 
     @Before
     public void setUp() {
@@ -45,78 +41,50 @@ public class PaymentServiceImplTest {
 
 
     @Test
-    public void paymentRequest_200_unparsable() throws P24ValidationException, IOException {
+    public void paymentRequest_200_unparsable() throws P24ValidationException, IOException, URISyntaxException {
         PaymentRequest paymentRequest = TestUtils.createCompletePaymentRequest();
 
         Mockito.when(requestUtils.isSandbox(Mockito.eq(paymentRequest))).thenReturn(true);
-        Response.Builder builder = new Response.Builder()
-                .addHeader("content-type", "application/json");
-        Response respHttp = builder.code(200)
-                .protocol(Protocol.HTTP_1_0)
-                .request(new Request.Builder().url("https://mvnrepository.com").build())
-                .body(ResponseBody.create(MediaType.parse("application/txt"), ""))
-                .message("")
-                .build();
-        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(respHttp);
+        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(TestUtils.createResponse(200, ""));
 
         PaymentResponse response = paymentService.paymentRequest(paymentRequest);
         Assert.assertNotNull(response);
         Assert.assertEquals(PaymentResponseFailure.class, response.getClass());
         Assert.assertEquals(FailureCause.INVALID_DATA, ((PaymentResponseFailure) response).getFailureCause());
-
     }
 
     @Test
-    public void paymentRequest_9000() throws P24ValidationException, IOException {
+    public void paymentRequest_9000() throws P24ValidationException, IOException, URISyntaxException {
         PaymentRequest paymentRequest = TestUtils.createCompletePaymentRequest();
 
         Mockito.when(requestUtils.isSandbox(Mockito.eq(paymentRequest))).thenReturn(true);
-        Response.Builder builder = new Response.Builder()
-                .addHeader("content-type", "application/json");
-        Response respHttp = builder.code(9000)
-                .protocol(Protocol.HTTP_1_0)
-                .request(new Request.Builder().url("https://mvnrepository.com").build())
-                .body(ResponseBody.create(MediaType.parse("application/txt"), ""))
-                .message("")
-                .build();
-        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(respHttp);
+        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(TestUtils.createResponse(9000, ""));
 
         PaymentResponse response = paymentService.paymentRequest(paymentRequest);
         Assert.assertNotNull(response);
         Assert.assertEquals(PaymentResponseFailure.class, response.getClass());
         Assert.assertEquals(FailureCause.COMMUNICATION_ERROR, ((PaymentResponseFailure) response).getFailureCause());
-
     }
 
 
     @Test
-    public void paymentRequest_success() throws P24ValidationException, IOException {
+    public void paymentRequest_success() throws P24ValidationException, IOException, URISyntaxException {
         PaymentRequest paymentRequest = TestUtils.createCompletePaymentRequest();
 
         Mockito.when(requestUtils.isSandbox(Mockito.eq(paymentRequest))).thenReturn(true);
-        Response.Builder builder = new Response.Builder()
-                .addHeader("content-type", "application/json");
-        Response respHttp = builder.code(200)
-                .protocol(Protocol.HTTP_1_0)
-                .request(new Request.Builder().url("https://mvnrepository.com").build())
-                .body(ResponseBody.create(MediaType.parse("application/txt"), "error=0&token=hfgjfjyj"))
-                .message("")
-                .build();
-        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(respHttp);
+        Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap())).thenReturn(TestUtils.createResponse(200, "error=0&token=dummytoken"));
 
         PaymentResponse response = paymentService.paymentRequest(paymentRequest);
         Assert.assertNotNull(response);
         Assert.assertEquals(PaymentResponseRedirect.class, response.getClass());
-
     }
 
 
     @Test
-    public void paymentRequest_IOException() throws P24ValidationException, IOException {
+    public void paymentRequest_IOException() throws P24ValidationException, IOException, URISyntaxException {
         PaymentRequest paymentRequest = TestUtils.createCompletePaymentRequest();
 
         Mockito.when(requestUtils.isSandbox(Mockito.eq(paymentRequest))).thenReturn(true);
-
         Mockito.when(httpClient.doPost(Mockito.anyString(), Mockito.eq(P24Path.REGISTER), Mockito.anyMap()))
                 .thenThrow(new IOException());
 
@@ -124,12 +92,11 @@ public class PaymentServiceImplTest {
         Assert.assertNotNull(response);
         Assert.assertEquals(PaymentResponseFailure.class, response.getClass());
         Assert.assertEquals(FailureCause.INTERNAL_ERROR, ((PaymentResponseFailure) response).getFailureCause());
-
     }
 
 
     @Test
-    public void paymentRequest_P24ValidationException() throws P24ValidationException, IOException {
+    public void paymentRequest_P24ValidationException() throws P24ValidationException {
         PaymentRequest paymentRequest = TestUtils.createCompletePaymentRequest();
 
         Mockito.when(requestUtils.isSandbox(Mockito.eq(paymentRequest))).thenThrow(new P24ValidationException(""));
@@ -138,8 +105,6 @@ public class PaymentServiceImplTest {
         Assert.assertNotNull(response);
         Assert.assertEquals(PaymentResponseFailure.class, response.getClass());
         Assert.assertEquals(FailureCause.INVALID_DATA, ((PaymentResponseFailure) response).getFailureCause());
-
     }
-
 
 }

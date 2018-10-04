@@ -19,7 +19,7 @@ public class LocalizationImpl implements LocalizationService {
      * Singleton threadsafe avec initialisation tardive.
      */
     public static LocalizationService getInstance() {
-        return LocalizationImpl.SingletonWrapper.INSTANCE;
+        return SingletonWrapper.INSTANCE;
     }
 
     /**

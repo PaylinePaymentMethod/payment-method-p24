@@ -162,11 +162,5 @@ public class RefundServiceImpl implements RefundService {
             throw new P24ValidationException(err);
 
         }
-//        if (requestUtils.isNotNumeric(refundRequest.getTransactionId())) {
-//            String err = "Invalid data : trnBySessionIdOrderIdValue is not numeric";
-//            LOG.error(err);
-//            throw new P24ValidationException(err);
-//        }
-
     }
 }

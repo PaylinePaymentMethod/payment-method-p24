@@ -12,11 +12,12 @@ import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.PasswordParameter;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.service.ConfigurationService;
-import okhttp3.Response;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -30,7 +31,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private static final String LABEL = ".label";
     private static final String DESCRIPTION = ".description";
     private static final String VERSION = "1.0";
-    private static final String RELEASE_DATE = "01/09/1018";
+    private static final String RELEASE_DATE = "04/10/2018";
 
 
     private LocalizationService localization;
@@ -41,7 +42,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     private SoapHelper soapHelper;
 
-    public ConfigurationServiceImpl() throws GeneralSecurityException {
+    public ConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
         p24HttpClient = new P24HttpClient();
         requestUtils = new RequestUtils();
@@ -81,20 +82,20 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
             // do the request
             String host = P24Url.REST_HOST.getUrl(isSandbox);
-            Response response = p24HttpClient.doPost(host, P24Path.CHECK, bodyMap);
+            HttpResponse response = p24HttpClient.doPost(host, P24Path.CHECK, bodyMap);
 
             // parse the response
-            if (response.code() != 200) {
+            if (response.getStatusLine().getStatusCode() != 200) {
                 errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(WRONG_SEVER_RESPONSE, locale));
             } else {
 
-                String responseMessage = response.body().string();
+                String responseMessage = EntityUtils.toString(response.getEntity(), "UTF-8");
                 if (!"error=0".equals(responseMessage)) {
                     // response message contains errors
                     errors.putAll(getErrors(responseMessage, locale));
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             errors.put(ContractParametersCheckRequest.GENERIC_ERROR, localization.getSafeLocalizedString(NETWORK_ERROR, locale));
         }
     }
@@ -147,7 +148,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         parameters.add(merchantKey);
 
         // P24 password of the merchant
-        final PasswordParameter merchantPassword = new PasswordParameter();
+        final InputParameter merchantPassword = new InputParameter();
         merchantPassword.setKey(P24Constants.MERCHANT_MDP);
         merchantPassword.setLabel(localization.getSafeLocalizedString("contract.merchantPassword.label", locale));
         merchantPassword.setDescription(localization.getSafeLocalizedString("contract.merchantPassword.description", locale));

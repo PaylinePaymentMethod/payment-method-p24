@@ -25,9 +25,10 @@ public class TestUtils {
     public static final String SUCCESS_URL = "https://succesurl.com/";
     public static final String CANCEL_URL = "http://localhost/cancelurl.com/";
     public static final String NOTIFICATION_URL = "http://google.com/";
-    public static final String MERCHANT_ID = "merchantId";
-    public static final String POS_ID = "posId";
-    public static final String MERCHANT_KEY = "merchantKey";
+    public static final String MERCHANT_ID = "65840";
+    public static final String POS_ID = "65840";
+    public static final String MERCHANT_KEY = "0f67a7fec13ff180";
+    public static final String MERCHANT_PASSWORD = "76feca7a92aee7d069e32a66b7e8cef4";
 
     /**
      * Create a paymentRequest with default parameters.
@@ -60,7 +61,7 @@ public class TestUtils {
 
     public static RefundRequest createRefundRequest(String transactionId) {
         final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
-//        final String transactionID = createTransactionId();
+//        final String transactionID = createRandom();
         final Amount amount = createAmount("EUR");
         return RefundRequest.RefundRequestBuilder.aRefundRequest()
                 .withAmount(amount)
@@ -68,9 +69,9 @@ public class TestUtils {
                 .withBuyer(createDefaultBuyer())
                 .withContractConfiguration(createContractConfiguration())
                 .withPaylineEnvironment(paylineEnvironment)
-                .withTransactionId(transactionId)
+                .withTransactionId("10")
                 .withPartnerTransactionId("toto")
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
                 .build();
     }
 
@@ -103,14 +104,11 @@ public class TestUtils {
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount("PLN");
         final ContractConfiguration contractConfiguration = createContractConfiguration();
-
         final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
-        final String transactionID = createTransactionId();
-        final Order order = createOrder(transactionID);
+        final Order order = createOrder(createRandom());
         final String softDescriptor = "softDescriptor";
         final Locale locale = new Locale("FR");
-
-        Buyer buyer = createDefaultBuyer();
+        final Buyer buyer = createDefaultBuyer();
 
         return PaymentRequest.builder()
                 .withAmount(amount)
@@ -119,25 +117,26 @@ public class TestUtils {
                 .withPaylineEnvironment(paylineEnvironment)
                 .withOrder(order)
                 .withLocale(locale)
-                .withTransactionId(transactionID)
+                .withTransactionId(createRandom())
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer);
     }
 
 
-    public static String createTransactionId() {
-        return "transactionID" + Calendar.getInstance().getTimeInMillis();
+    public static String createRandom() {
+        String numaberId = ("" + Calendar.getInstance().getTimeInMillis());
+        return numaberId.substring(numaberId.length() - 7, numaberId.length() - 1);
     }
 
-    public static Map<Buyer.AddressType, Buyer.Address> createAddresses(Buyer.Address address) {
-        Map<Buyer.AddressType, Buyer.Address> addresses = new HashMap<>();
+    public static Map<Buyer.AddressType, Address> createAddresses(Address address) {
+        Map<Buyer.AddressType, Address> addresses = new HashMap<>();
         addresses.put(Buyer.AddressType.DELIVERY, address);
         addresses.put(Buyer.AddressType.BILLING, address);
 
         return addresses;
     }
 
-    public static Map<Buyer.AddressType, Buyer.Address> createDefaultAddresses() {
+    public static Map<Buyer.AddressType, Address> createDefaultAddresses() {
         Address address = createDefaultAddress();
         return createAddresses(address);
     }
@@ -165,18 +164,24 @@ public class TestUtils {
         return phoneNumbers;
     }
 
-    public static ContractConfiguration createContractConfiguration() {
-        final ContractConfiguration contractConfiguration = new ContractConfiguration("", new HashMap<>());
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_ID, new ContractProperty(MERCHANT_ID));
-        contractConfiguration.getContractProperties().put(P24Constants.POS_ID, new ContractProperty(POS_ID));
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_KEY, new ContractProperty(MERCHANT_KEY));
-        contractConfiguration.getContractProperties().put(P24Constants.MERCHANT_MDP, new ContractProperty("merchantPassword"));
-
-        return contractConfiguration;
+    public static Map<String, ContractProperty> generateParameterContract() {
+        final Map<String, ContractProperty> propertyMap = new HashMap<>();
+        propertyMap.put(P24Constants.MERCHANT_ID, new ContractProperty(MERCHANT_ID));
+        propertyMap.put(P24Constants.MERCHANT_MDP, new ContractProperty(MERCHANT_PASSWORD));
+        propertyMap.put(P24Constants.POS_ID, new ContractProperty(POS_ID));
+        propertyMap.put(P24Constants.MERCHANT_KEY, new ContractProperty(MERCHANT_KEY));
+        propertyMap.put(P24Constants.TIME_LIMIT, new ContractProperty("15"));
+        propertyMap.put(P24Constants.WAIT_FOR_RESULT, new ContractProperty("1"));
+        propertyMap.put(P24Constants.SHIPPING, new ContractProperty("0"));
+        return propertyMap;
     }
 
-    public static Buyer.Address createAddress(String street, String city, String zip) {
-        return Buyer.Address.AddressBuilder.anAddress()
+    public static ContractConfiguration createContractConfiguration() {
+        return new ContractConfiguration("", generateParameterContract());
+    }
+
+    public static Address createAddress(String street, String city, String zip) {
+        return Address.AddressBuilder.anAddress()
                 .withStreet1(street)
                 .withCity(city)
                 .withZipCode(zip)
@@ -184,11 +189,11 @@ public class TestUtils {
                 .build();
     }
 
-    public static Buyer.Address createDefaultAddress() {
+    public static Address createDefaultAddress() {
         return createAddress("a street", "a city", "a zip");
     }
 
-    public static Buyer createBuyer(Map<Buyer.PhoneNumberType, String> phoneNumbers, Map<Buyer.AddressType, Buyer.Address> addresses, Buyer.FullName fullName) {
+    public static Buyer createBuyer(Map<Buyer.PhoneNumberType, String> phoneNumbers, Map<Buyer.AddressType, Address> addresses, Buyer.FullName fullName) {
         return Buyer.BuyerBuilder.aBuyer()
                 .withEmail("foo@bar.baz")
                 .withPhoneNumbers(phoneNumbers)

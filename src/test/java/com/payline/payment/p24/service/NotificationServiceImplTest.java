@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
-import java.io.ByteArrayInputStream;
-import java.util.Collections;
+import java.io.InputStream;
+import java.util.HashMap;
 
 public class NotificationServiceImplTest {
 
@@ -26,22 +26,28 @@ public class NotificationServiceImplTest {
 
     @Test
     public void parse_null() {
-        NotificationResponse reponse = notificationService.parse(null);
-        Assert.assertNotNull(reponse);
-        Assert.assertEquals(IgnoreNotificationResponse.class, reponse.getClass());
+        NotificationResponse response = notificationService.parse(null);
+        Assert.assertNotNull(response);
+        Assert.assertEquals(IgnoreNotificationResponse.class, response.getClass());
     }
 
     @Test
     public void parse_notNull() {
-        final NotificationRequest notificationRequest = NotificationRequest.NotificationRequestBuilder.aNotificationRequest()
-                .withHttpMethod("POST")
-                .withPathInfo("/path")
-                .withContent(new ByteArrayInputStream("".getBytes()))
-                .withHeaderInfos(Collections.emptyMap())
+        NotificationRequest request = NotificationRequest.NotificationRequestBuilder
+                .aNotificationRequest()
+                .withHttpMethod("GET")
+                .withPathInfo("")
+                .withContent(new InputStream() {
+                    @Override
+                    public int read() {
+                        return 0;
+                    }
+                })
+                .withHeaderInfos(new HashMap<>())
                 .build();
-        NotificationResponse reponse = notificationService.parse(notificationRequest);
-        Assert.assertNotNull(reponse);
-        Assert.assertEquals(IgnoreNotificationResponse.class, reponse.getClass());
+        NotificationResponse response = notificationService.parse(request);
+        Assert.assertNotNull(response);
+        Assert.assertEquals(IgnoreNotificationResponse.class, response.getClass());
     }
 
 }

@@ -175,6 +175,8 @@ public class P24RegisterRequestTest {
 
     @Test
     public void ConstructorInvocationWoCountry() throws P24ValidationException {
+        expectedEx.expect(P24ValidationException.class);
+        expectedEx.expectMessage(P24ErrorMessages.MISSING_BUYER);
         Buyer.Address address = Buyer.Address.AddressBuilder.anAddress()
                 .withCountry("")
                 .build();

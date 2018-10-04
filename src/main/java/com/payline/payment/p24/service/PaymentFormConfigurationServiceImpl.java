@@ -26,7 +26,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
     private LocalizationService localization;
 
-    public PaymentFormConfigurationServiceImpl(){
+    public PaymentFormConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
     }
 
@@ -44,27 +44,35 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
     @Override
     public PaymentFormLogoResponse getPaymentFormLogo(PaymentFormLogoRequest paymentFormLogoRequest) {
         return PaymentFormLogoResponseFile.PaymentFormLogoResponseFileBuilder.aPaymentFormLogoResponseFile()
-                .withContentType( LOGO_CONTENT_TYPE )
-                .withHeight( LOGO_HEIGHT )
-                .withWidth( LOGO_WIDTH )
-                .withTitle( localization.getSafeLocalizedString( "project.name", paymentFormLogoRequest.getLocale() ) )
-                .withAlt(  localization.getSafeLocalizedString( "project.name", paymentFormLogoRequest.getLocale() ) )
+                .withHeight(LOGO_HEIGHT)
+                .withWidth(LOGO_WIDTH)
+                .withTitle(localization.getSafeLocalizedString("project.name", paymentFormLogoRequest.getLocale()))
+                .withAlt(localization.getSafeLocalizedString("project.name", paymentFormLogoRequest.getLocale()))
                 .build();
     }
 
     @Override
-    public PaymentFormLogo getLogo(Locale locale) throws IOException {
+    public PaymentFormLogo getLogo(String var1, Locale locale) {
         // Read logo file
-        InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream( "p24-logo.png" );
-        BufferedImage logo = ImageIO.read( input );
+        InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("p24-logo.png");
+        BufferedImage logo = null;
+        try {
+            logo = ImageIO.read(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Recover byte array from image
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write( logo, "png", baos );
+        try {
+            ImageIO.write(logo, "png", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
-                .withFile( baos.toByteArray() )
-                .withContentType( LOGO_CONTENT_TYPE )
+                .withFile(baos.toByteArray())
+                .withContentType(LOGO_CONTENT_TYPE)
                 .build();
     }
 
