@@ -53,27 +53,21 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
 
     @Override
     public PaymentFormLogo getLogo(String var1, Locale locale) {
-        // Read logo file
-        InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("p24-logo.png");
-        BufferedImage logo = null;
         try {
-            logo = ImageIO.read(input);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Recover byte array from image
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
+            // Read logo file
+            InputStream input = PaymentFormConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("p24-logo.png");
+            BufferedImage logo = ImageIO.read(input);
+            // Recover byte array from image
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(logo, "png", baos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
-                .withFile(baos.toByteArray())
-                .withContentType(LOGO_CONTENT_TYPE)
-                .build();
+            return PaymentFormLogo.PaymentFormLogoBuilder.aPaymentFormLogo()
+                    .withFile(baos.toByteArray())
+                    .withContentType(LOGO_CONTENT_TYPE)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
