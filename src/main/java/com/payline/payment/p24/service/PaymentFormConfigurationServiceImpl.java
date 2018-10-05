@@ -10,6 +10,8 @@ import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFor
 import com.payline.pmapi.bean.paymentform.response.logo.PaymentFormLogoResponse;
 import com.payline.pmapi.bean.paymentform.response.logo.impl.PaymentFormLogoResponseFile;
 import com.payline.pmapi.service.PaymentFormConfigurationService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -20,6 +22,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigurationService {
+    private static final Logger logger = LogManager.getLogger("PaymentFormConfigurationService");
+
     private static final String LOGO_CONTENT_TYPE = "image/png";
     private static final int LOGO_HEIGHT = 25;
     private static final int LOGO_WIDTH = 56;
@@ -66,6 +70,7 @@ public class PaymentFormConfigurationServiceImpl implements PaymentFormConfigura
                     .withContentType(LOGO_CONTENT_TYPE)
                     .build();
         } catch (IOException e) {
+            logger.error("Unable to load the logo", e.getMessage());
             throw new RuntimeException(e);
         }
     }
