@@ -116,7 +116,7 @@ public class RefundServiceImpl implements RefundService {
             if (SoapErrorCodeEnum.OK == errorCode) {
                 return RefundResponseSuccess.RefundResponseSuccessBuilder.aRefundResponseSuccess()
                         .withStatusCode("0")
-                        .withTransactionId(String.valueOf(batch))
+                        .withPartnerTransactionId(String.valueOf(batch))
                         .build();
 
             } else {
@@ -143,7 +143,7 @@ public class RefundServiceImpl implements RefundService {
         return RefundResponseFailure.RefundResponseFailureBuilder.aRefundResponseFailure()
                 .withErrorCode(errorCode)
                 .withFailureCause(failureCause)
-                .withTransactionId(transactionId)
+                .withPartnerTransactionId(transactionId)
                 .build();
     }
 

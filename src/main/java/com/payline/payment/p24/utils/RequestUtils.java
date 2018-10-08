@@ -18,10 +18,10 @@ public class RequestUtils {
      * @throws P24ValidationException
      */
     public boolean isSandbox(Request request) throws P24ValidationException {
-        if (request.getPaylineEnvironment() == null) {
+        if (request.getEnvironment() == null) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT);
         }
-        return request.getPaylineEnvironment().isSandbox();
+        return request.getEnvironment().isSandbox();
     }
 
     /**
@@ -30,10 +30,10 @@ public class RequestUtils {
      * @throws P24ValidationException
      */
     public boolean isSandbox(ContractParametersCheckRequest request) throws P24ValidationException {
-        if (request.getPaylineEnvironment() == null) {
+        if (request.getEnvironment() == null) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT);
         }
-        return request.getPaylineEnvironment().isSandbox();
+        return request.getEnvironment().isSandbox();
     }
 
     /**

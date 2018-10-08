@@ -38,7 +38,7 @@ public class TestUtils {
     public static PaymentRequest createDefaultPaymentRequest() {
         final Amount amount = createAmount("EUR");
         final ContractConfiguration contractConfiguration = createContractConfiguration();
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+        final Environment environment = new Environment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         final String transactionID = "transactionID";
         final Order order = createOrder(transactionID);
         final String softDescriptor = "softDescriptor";
@@ -47,10 +47,13 @@ public class TestUtils {
                 .withAmount(amount)
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withContractConfiguration(contractConfiguration)
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withOrder(order)
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
+                .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withEnvironment(new Environment("", "", "", true))
                 .build();
     }
 
@@ -60,7 +63,7 @@ public class TestUtils {
     }
 
     public static RefundRequest createRefundRequest(String transactionId) {
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+        final Environment environment = new Environment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
 //        final String transactionID = createRandom();
         final Amount amount = createAmount("EUR");
         return RefundRequest.RefundRequestBuilder.aRefundRequest()
@@ -68,7 +71,7 @@ public class TestUtils {
                 .withOrder(createOrder(transactionId, amount))
                 .withBuyer(createDefaultBuyer())
                 .withContractConfiguration(createContractConfiguration())
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withTransactionId("10")
                 .withPartnerTransactionId("toto")
                 .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
@@ -104,7 +107,7 @@ public class TestUtils {
     public static PaymentRequest.Builder createCompletePaymentBuilder() {
         final Amount amount = createAmount("PLN");
         final ContractConfiguration contractConfiguration = createContractConfiguration();
-        final PaylineEnvironment paylineEnvironment = new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+        final Environment environment = new Environment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
         final Order order = createOrder(createRandom());
         final String softDescriptor = "softDescriptor";
         final Locale locale = new Locale("FR");
@@ -114,12 +117,14 @@ public class TestUtils {
                 .withAmount(amount)
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withContractConfiguration(contractConfiguration)
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withOrder(order)
                 .withLocale(locale)
                 .withTransactionId(createRandom())
                 .withSoftDescriptor(softDescriptor)
-                .withBuyer(buyer);
+                .withBuyer(buyer)
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withBrowser(new Browser("", Locale.FRANCE));
     }
 
 

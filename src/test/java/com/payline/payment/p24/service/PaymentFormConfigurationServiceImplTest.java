@@ -3,7 +3,7 @@ package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
@@ -64,7 +64,7 @@ public class PaymentFormConfigurationServiceImplTest {
                 .withLocale(Locale.getDefault())
                 .withContractConfiguration(TestUtils.createContractConfiguration())
                 .withPartnerConfiguration(new PartnerConfiguration(null, null))
-                .withPaylineEnvironment(new PaylineEnvironment("","","",true))
+                .withEnvironment(new Environment("","","",true))
                 .build();
         PaymentFormLogoResponse paymentFormLogoResponse = service.getPaymentFormLogo(request);
 

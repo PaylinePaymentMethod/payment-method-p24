@@ -95,7 +95,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
                         // SUCCESS!
                         return PaymentResponseSuccess.PaymentResponseSuccessBuilder.aPaymentResponseSuccess()
                                 .withStatusCode("0")
-                                .withTransactionIdentifier(sessionId)
+                                .withPartnerTransactionId(sessionId)
                                 .withTransactionDetails(Email.EmailBuilder.anEmail().withEmail(email).build())
                                 .build();
 
@@ -129,7 +129,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
             String password = transactionStatusRequest.getContractConfiguration().getProperty(P24Constants.MERCHANT_MDP).getValue();
             String sessionId = transactionStatusRequest.getOrder().getReference();
 
-            boolean isSandbox = transactionStatusRequest.getPaylineEnvironment().isSandbox();
+            boolean isSandbox = transactionStatusRequest.getEnvironment().isSandbox();
 
             // call /trnBySessionId
             P24TrnBySessionIdRequest sessionIdRequest = new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
@@ -156,7 +156,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
                         // SUCCESS!
                         return PaymentResponseSuccess.PaymentResponseSuccessBuilder.aPaymentResponseSuccess()
                                 .withStatusCode("0")
-                                .withTransactionIdentifier(orderId)
+                                .withPartnerTransactionId(orderId)
                                 .withTransactionDetails(Email.EmailBuilder.anEmail().withEmail(email).build())
                                 .build();
 

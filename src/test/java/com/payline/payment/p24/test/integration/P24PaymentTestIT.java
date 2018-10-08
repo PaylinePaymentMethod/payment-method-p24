@@ -9,7 +9,7 @@ import com.payline.payment.p24.service.PaymentWithRedirectionServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractProperty;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.PaymentFormContext;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import com.payline.pmapi.integration.AbstractPaymentIntegration;
@@ -33,8 +33,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
     private static final Logger logger = LogManager.getLogger("AbstractPaymentTest");
 
-    private final PaylineEnvironment paylineEnvironment =
-            new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+    private final Environment environment =
+            new Environment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
 
     private PaymentService paymentService = new PaymentServiceImpl();
     private ConfigurationServiceImpl configurationServiceImpl = new ConfigurationServiceImpl();
@@ -50,7 +50,7 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(TestUtils.createContractConfiguration())
-                        .withPaylineEnvironment(paylineEnvironment)
+                        .withEnvironment(environment)
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         P24CheckConnectionRequest p24CheckConnectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);

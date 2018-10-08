@@ -2,7 +2,10 @@ package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.utils.*;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import com.payline.pmapi.bean.common.Buyer;
+import com.payline.pmapi.bean.configuration.PartnerConfiguration;
+import com.payline.pmapi.bean.payment.Browser;
+import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.request.RedirectionPaymentRequest;
 import com.payline.pmapi.bean.payment.response.PaymentResponse;
 import com.payline.pmapi.bean.payment.response.impl.PaymentResponseFailure;
@@ -22,6 +25,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Locale;
 
 import static com.payline.payment.p24.bean.TestUtils.NOTIFICATION_URL;
 import static com.payline.payment.p24.bean.TestUtils.SUCCESS_URL;
@@ -32,8 +37,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PaymentWithRedirectionServiceImplTest {
-    private final PaylineEnvironment paylineEnvironment =
-            new PaylineEnvironment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
+    private final Environment environment =
+            new Environment(NOTIFICATION_URL, SUCCESS_URL, CANCEL_URL, true);
 
     private HttpResponse okResponse = TestUtils.createResponseOK();
     private HttpResponse koResponse = TestUtils.createResponseKO();
@@ -102,9 +107,13 @@ public class PaymentWithRedirectionServiceImplTest {
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withTransactionId("123")
                 .withContractConfiguration(TestUtils.createContractConfiguration())
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withOrder(TestUtils.createOrder("test"))
                 .withAmount(TestUtils.createAmount("EUR"))
+                .withBrowser(new Browser("", Locale.FRANCE))
+                .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
+                .withSoftDescriptor("")
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
                 .build();
         PaymentResponse response = service.finalizeRedirectionPayment(redirectionPaymentRequest);
 
@@ -119,9 +128,14 @@ public class PaymentWithRedirectionServiceImplTest {
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withContractConfiguration(TestUtils.createContractConfiguration())
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withOrder(TestUtils.createOrder("test"))
                 .withAmount(TestUtils.createAmount("EUR"))
+                .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withBrowser(new Browser("", Locale.FRANCE))
+                .withTransactionId("")
+                .withSoftDescriptor("")
                 .build();
         PaymentResponse response = service.finalizeRedirectionPayment(redirectionPaymentRequest);
 
@@ -138,9 +152,14 @@ public class PaymentWithRedirectionServiceImplTest {
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
                 .withContractConfiguration(TestUtils.createContractConfiguration())
-                .withPaylineEnvironment(paylineEnvironment)
+                .withEnvironment(environment)
                 .withOrder(TestUtils.createOrder("test"))
                 .withAmount(TestUtils.createAmount("EUR"))
+                .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withBrowser(new Browser("", Locale.FRANCE))
+                .withTransactionId("")
+                .withSoftDescriptor("")
                 .build();
         PaymentResponse response = service.finalizeRedirectionPayment(redirectionPaymentRequest);
 

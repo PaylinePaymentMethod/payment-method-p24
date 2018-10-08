@@ -8,7 +8,7 @@ import com.payline.payment.p24.utils.P24Constants;
 import com.payline.payment.p24.utils.SecurityManager;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class P24CheckConnectionRequestTest {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(contractConfiguration)
-                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withEnvironment(new Environment("", "", "", true))
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         p24CheckConnectionRequest = new P24CheckConnectionRequest(contractParametersCheckRequest);
@@ -106,7 +106,7 @@ public class P24CheckConnectionRequestTest {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(contractConfiguration)
-                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withEnvironment(new Environment("", "", "", true))
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         P24CheckConnectionRequest p24Rq = new P24CheckConnectionRequest(contractParametersCheckRequest);
@@ -134,7 +134,7 @@ public class P24CheckConnectionRequestTest {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(contractConfiguration)
-                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withEnvironment(new Environment("", "", "", true))
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         P24CheckConnectionRequest p24Rq = new P24CheckConnectionRequest(contractParametersCheckRequest);
@@ -162,7 +162,7 @@ public class P24CheckConnectionRequestTest {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(contractConfiguration)
-                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withEnvironment(new Environment("", "", "", true))
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         P24CheckConnectionRequest p24Rq = new P24CheckConnectionRequest(contractParametersCheckRequest);
@@ -190,7 +190,7 @@ public class P24CheckConnectionRequestTest {
         ContractParametersCheckRequest contractParametersCheckRequest =
                 ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                         .withContractConfiguration(contractConfiguration)
-                        .withPaylineEnvironment(new PaylineEnvironment("", "", "", true))
+                        .withEnvironment(new Environment("", "", "", true))
                         .withAccountInfo(bodyMap)
                         .withLocale(Locale.FRANCE).build();
         P24CheckConnectionRequest p24Rq = new P24CheckConnectionRequest(contractParametersCheckRequest);

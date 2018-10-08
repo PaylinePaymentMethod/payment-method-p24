@@ -9,7 +9,7 @@ import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
+import com.payline.pmapi.bean.payment.Environment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
@@ -256,14 +256,14 @@ public class ConfigurationServiceImplTest {
         accountInfo.put(P24Constants.MERCHANT_MDP, password);
 
         ContractConfiguration configuration = new ContractConfiguration("test", null);
-        PaylineEnvironment environment = new PaylineEnvironment("notificationURL", "redirectionURL", "redirectionCancelURL", true);
+        Environment environment = new Environment("notificationURL", "redirectionURL", "redirectionCancelURL", true);
         PartnerConfiguration partnerConfiguration = new PartnerConfiguration(new HashMap<>(), new HashMap<>());
 
         return ContractParametersCheckRequest.CheckRequestBuilder.aCheckRequest()
                 .withAccountInfo(accountInfo)
                 .withLocale(locale)
                 .withContractConfiguration(configuration)
-                .withPaylineEnvironment(environment)
+                .withEnvironment(environment)
                 .withPartnerConfiguration(partnerConfiguration)
                 .build();
     }

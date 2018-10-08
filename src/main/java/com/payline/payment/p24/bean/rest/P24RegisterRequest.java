@@ -10,8 +10,8 @@ import com.payline.pmapi.bean.common.Amount;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.ContractProperty;
+import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.Order;
-import com.payline.pmapi.bean.payment.PaylineEnvironment;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,7 +89,7 @@ public class P24RegisterRequest extends P24Request {
             this.language = paymentRequest.getLocale().getLanguage();
         }
 
-        this.urlStatus = paymentRequest.getPaylineEnvironment().getNotificationURL();
+        this.urlStatus = paymentRequest.getEnvironment().getNotificationURL();
 
         /**
          * FIXME attendre l'évolution de l'APM API =>
@@ -182,7 +182,7 @@ public class P24RegisterRequest extends P24Request {
 
     private Buyer.Address getBuyerAdresse(Buyer buyer) throws P24ValidationException {
 
-        if (buyer == null || buyer.getAddresses() == null || buyer.getAddresses().isEmpty()) {
+        if (buyer.getAddresses() == null || buyer.getAddresses().isEmpty()) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_BUYER, P24ErrorMessages.MISSING_ADRESSE_TYPE);
         }
         Buyer.Address addr = buyer.getAddressForType(Buyer.AddressType.BILLING);
@@ -204,7 +204,7 @@ public class P24RegisterRequest extends P24Request {
 
     private void validateAmount(Amount amount) throws P24ValidationException {
 
-        if (amount == null || amount.getAmountInSmallestUnit() == null) {
+        if (amount.getAmountInSmallestUnit() == null) {
             LOG.error("Invalid data : amount in smallest unit is mandatory");
             throw new P24ValidationException(P24ErrorMessages.MISSING_AMOUNT, P24ErrorMessages.MISSING_AMOUNT_UNIT);
         }
@@ -215,18 +215,18 @@ public class P24RegisterRequest extends P24Request {
     }
 
     private String getRedirectionReturnURL(PaymentRequest paymentRequest) throws P24ValidationException {
-        PaylineEnvironment paylineEnvironment = paymentRequest.getPaylineEnvironment();
-        if (paylineEnvironment == null
-                || super.getRequestUtils().isEmpty(paylineEnvironment.getRedirectionReturnURL())) {
+        Environment environment = paymentRequest.getEnvironment();
+        if (environment == null
+                || super.getRequestUtils().isEmpty(environment.getRedirectionReturnURL())) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_ENVIRONNEMENT, P24ErrorMessages.MISSING_RETURN_URL);
         }
 
-        return paylineEnvironment.getRedirectionReturnURL();
+        return environment.getRedirectionReturnURL();
     }
 
     private String getOrderReference(PaymentRequest paymentRequest) throws P24ValidationException {
         Order order = paymentRequest.getOrder();
-        if (order == null || super.getRequestUtils().isEmpty(order.getReference())) {
+        if (super.getRequestUtils().isEmpty(order.getReference())) {
             throw new P24ValidationException(P24ErrorMessages.MISSING_ORDER, P24ErrorMessages.MISSING_ORDER_REF);
         }
 
