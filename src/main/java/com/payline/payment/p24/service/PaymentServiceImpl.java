@@ -29,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private RequestUtils requestUtils;
 
     public PaymentServiceImpl() {
-        p24HttpClient = new P24HttpClient();
+        p24HttpClient = P24HttpClient.getInstance();
         requestUtils = new RequestUtils();
     }
 

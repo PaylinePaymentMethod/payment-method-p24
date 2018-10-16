@@ -44,7 +44,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     public ConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
-        p24HttpClient = new P24HttpClient();
+        p24HttpClient = P24HttpClient.getInstance();
         requestUtils = new RequestUtils();
         soapHelper = new SoapHelper();
     }

@@ -29,7 +29,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
     private SoapHelper soapHelper;
 
     public PaymentWithRedirectionServiceImpl() {
-        this.p24HttpClient = new P24HttpClient();
+        this.p24HttpClient = P24HttpClient.getInstance();
         this.requestUtils = new RequestUtils();
         this.soapHelper = new SoapHelper();
     }
