@@ -20,6 +20,10 @@ ext {
     releaseDirectoryPath = 'D:/build'
 }
 
+configurations {
+    fatJarTest
+}
+
 sonarqube {
     properties {
         property "sonar.jacoco.reportPaths", "${project.buildDir}/jacoco/test.exec"
@@ -43,8 +47,8 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
 
     // JUnit and Mockito
-    testCompile "junit:junit:4.11"
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
+    testImplementation "junit:junit:4.11"
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
 
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.13.0'
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '3.13.0'
@@ -53,6 +57,12 @@ dependencies {
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.3'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.3'
+
+    // fatJarTest include testImplementation dependencies (not for IT)
+    fatJarTest "junit:junit:4.11"
+    fatJarTest group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
+    fatJarTest group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.3'
+    fatJarTest group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.3'
 }
 
 assemble.dependsOn shadowJar
@@ -87,6 +97,11 @@ publishing {
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
+
+            // For release only
+            if (!project.version.contains('-')) {
+                artifact testJar
+            }
         }
     }
 }
@@ -137,6 +152,14 @@ processResources {
                 'date': new Date().format("dd/MM/yyyy")
         ])
     }
+}
+
+// To create a JAR including test classes and dependencies
+task testJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    dependsOn 'shadowJar', 'testClasses'
+    classifier = 'tests'
+    from sourceSets.test.output.classesDirs + shadowJar
+    configurations = [project.configurations.fatJarTest]
 }
 
 test.exclude '**/test/integration/*'
