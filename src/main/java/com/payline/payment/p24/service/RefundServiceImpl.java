@@ -70,7 +70,7 @@ public class RefundServiceImpl implements RefundService {
 
             validateRequest(refundRequest);
             String sessionId = refundRequest.getOrder().getReference();
-            int amount = refundRequest.getOrder().getAmount().getAmountInSmallestUnit().intValue();
+            int amount = refundRequest.getAmount().getAmountInSmallestUnit().intValue();
 
             // Call P24.trnBySessionId and get the orderId from response
             P24TrnBySessionIdRequest trnBySessionIdRequest =

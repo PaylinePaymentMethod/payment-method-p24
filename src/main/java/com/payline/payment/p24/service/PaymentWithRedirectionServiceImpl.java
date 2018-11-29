@@ -79,6 +79,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                 // get needed info for REST request
                 String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
+                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
                 String email = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
 
                 // call trnVerify
@@ -93,10 +94,13 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                     if ("error=0".equalsIgnoreCase(responseMessage)) {
                         // SUCCESS!
+                        String additionalData = TransactionManagerServiceImpl.encode(orderId, orderIdFull, sessionId);
+
                         return PaymentResponseSuccess.PaymentResponseSuccessBuilder.aPaymentResponseSuccess()
                                 .withStatusCode("0")
                                 .withPartnerTransactionId(sessionId)
                                 .withTransactionDetails(Email.EmailBuilder.anEmail().withEmail(email).build())
+                                .withTransactionAdditionalData(additionalData)
                                 .build();
 
                     } else {
@@ -141,6 +145,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
                 // get needed info for REST request
                 String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
                 String email = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
+                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
 
                 // call trnVerify
                 P24VerifyRequest verifyRequest = new P24VerifyRequest(transactionStatusRequest, orderId);
@@ -154,10 +159,13 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                     if ("error=0".equalsIgnoreCase(responseMessage)) {
                         // SUCCESS!
+                        String additionalData = TransactionManagerServiceImpl.encode(orderId, orderIdFull, sessionId);
+
                         return PaymentResponseSuccess.PaymentResponseSuccessBuilder.aPaymentResponseSuccess()
                                 .withStatusCode("0")
                                 .withPartnerTransactionId(orderId)
                                 .withTransactionDetails(Email.EmailBuilder.anEmail().withEmail(email).build())
+                                .withTransactionAdditionalData(additionalData)
                                 .build();
 
                     } else {

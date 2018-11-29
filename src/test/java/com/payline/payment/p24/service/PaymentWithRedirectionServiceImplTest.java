@@ -99,6 +99,7 @@ public class PaymentWithRedirectionServiceImplTest {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
         when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
         when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.ORDER_ID))).thenReturn("orderId");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.SOAP_ORDER_ID))).thenReturn("orderIdFull");
         when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.EMAIL))).thenReturn("toto@toto.com");
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
