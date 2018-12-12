@@ -3,7 +3,12 @@ package com.payline.payment.p24.service;
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.errors.P24ValidationException;
-import com.payline.payment.p24.utils.*;
+import com.payline.payment.p24.utils.LocalizationService;
+import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.P24HttpClient;
+import com.payline.payment.p24.utils.P24Path;
+import com.payline.payment.p24.utils.RequestUtils;
+import com.payline.payment.p24.utils.SoapHelper;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
@@ -31,7 +36,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 
 public class ConfigurationServiceImplTest {
     private String goodMerchantId = "65840";
@@ -241,12 +250,16 @@ public class ConfigurationServiceImplTest {
     }
 
     @Test
-    public void getReleaseInformation() {
+    public void shouldGetReleaseInformation(){
+        // when: getReleaseInformation method is called
         ReleaseInformation releaseInformation = configurationService.getReleaseInformation();
-        Assert.assertNotNull(releaseInformation.getVersion());
-        Assert.assertNotNull(releaseInformation.getDate());
-    }
 
+        // then: the version has a valid format
+        Assert.assertNotNull( releaseInformation );
+        Assert.assertNotNull(releaseInformation.getDate());
+
+        Assert.assertTrue( releaseInformation.getVersion().matches( "^\\d\\.\\d(\\.\\d)?$" ) );
+    }
 
     private ContractParametersCheckRequest createContractParametersCheckRequest(String merchantId, String posId, String key, String password) {
         Map<String, String> accountInfo = new HashMap<>();

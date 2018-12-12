@@ -59,7 +59,7 @@ public class P24RegisterRequest extends P24Request {
         this.amount = amountObj.getAmountInSmallestUnit().toString();
         this.currency = amountObj.getCurrency().getCurrencyCode();
 
-        this.sessionId = paymentRequest.getTransactionId();
+        this.sessionId = getOrderReference(paymentRequest);
         this.description = getOrderReference(paymentRequest);
 
         Buyer buyer = paymentRequest.getBuyer();
@@ -119,7 +119,7 @@ public class P24RegisterRequest extends P24Request {
     /**
      * create the Map used to create the body
      *
-     * @return
+     * @return BodyMap
      */
     @Override
     public Map<String, String> createBodyMap() {
@@ -148,7 +148,7 @@ public class P24RegisterRequest extends P24Request {
         addIfNotNull(bodyMap, waitForResult, BodyMapKeys.WAIT_FOR_RESULT);
         addIfNotNull(bodyMap, channel, BodyMapKeys.CHANNEL);
         addIfNotNull(bodyMap, shipping, BodyMapKeys.SHIPPING);
-        addIfNotNull(bodyMap, transferLabel, BodyMapKeys.TRANSFER_LABEL);
+        addIfNotNull(bodyMap, abbreviate(transferLabel, 20), BodyMapKeys.TRANSFER_LABEL);
         addIfNotNull(bodyMap, encoding, BodyMapKeys.ENCODING);
         addIfNotNull(bodyMap, urlStatus, BodyMapKeys.URL_STATUS);
         addIfNotNull(bodyMap, timeLimit, BodyMapKeys.TIME_LIMIT);
@@ -156,12 +156,20 @@ public class P24RegisterRequest extends P24Request {
         return bodyMap;
     }
 
+    private String abbreviate(String str, int maxLenght) {
+        if (str == null || str.isEmpty() || str.length() <= maxLenght) {
+            return str;
+        }
+
+        return str.substring(0, maxLenght);
+    }
+
     /**
      * Put not null field in bodyMap
      *
-     * @param bodyMap
-     * @param field
-     * @param key
+     * @param bodyMap the BodyMap
+     * @param field   value to put
+     * @param key     key to put
      */
     private void addIfNotNull(Map<String, String> bodyMap, String field, BodyMapKeys key) {
         if (field != null) {

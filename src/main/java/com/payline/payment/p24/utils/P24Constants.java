@@ -35,6 +35,7 @@ public class P24Constants {
     public static final String LIST = "list";
     public static final String ORDER_ID = "orderIdFull";
     public static final String SOAP_ORDER_ID = "orderId";
+    public static final String SESSION_ID = "sessionId";
     public static final String EMAIL = "clientEmail";
     public static final String AMOUNT = "amount";
 

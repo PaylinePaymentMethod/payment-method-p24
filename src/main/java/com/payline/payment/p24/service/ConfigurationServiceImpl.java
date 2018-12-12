@@ -4,8 +4,15 @@ import com.payline.payment.p24.bean.rest.P24CheckConnectionRequest;
 import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
 import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.payment.p24.service.enums.ChannelKeys;
-import com.payline.payment.p24.utils.*;
-import com.payline.pmapi.bean.configuration.*;
+import com.payline.payment.p24.utils.LocalizationImpl;
+import com.payline.payment.p24.utils.LocalizationService;
+import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.P24HttpClient;
+import com.payline.payment.p24.utils.P24Path;
+import com.payline.payment.p24.utils.P24Url;
+import com.payline.payment.p24.utils.RequestUtils;
+import com.payline.payment.p24.utils.SoapHelper;
+import com.payline.pmapi.bean.configuration.ReleaseInformation;
 import com.payline.pmapi.bean.configuration.parameter.AbstractParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.InputParameter;
 import com.payline.pmapi.bean.configuration.parameter.impl.ListBoxParameter;
@@ -14,25 +21,38 @@ import com.payline.pmapi.bean.configuration.request.ContractParametersCheckReque
 import com.payline.pmapi.service.ConfigurationService;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 
-import static com.payline.payment.p24.errors.P24ErrorMessages.*;
+import static com.payline.payment.p24.errors.P24ErrorMessages.NETWORK_ERROR;
+import static com.payline.payment.p24.errors.P24ErrorMessages.TECHNICAL_ERROR;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_KEY;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_MERCHANT_ID;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_PASS;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_POS_ID;
+import static com.payline.payment.p24.errors.P24ErrorMessages.WRONG_SEVER_RESPONSE;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     private static final String CONTRACT = "contract.";
     private static final String LABEL = ".label";
     private static final String DESCRIPTION = ".description";
-    private static final String VERSION = "1.0";
-    private static final String RELEASE_DATE = "04/10/2018";
 
+    private static final String RELEASE_DATE_FORMAT = "dd/MM/yyyy";
+    private static final Logger LOGGER = LogManager.getLogger(ConfigurationServiceImpl.class);
 
     private LocalizationService localization;
 
@@ -44,7 +64,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     public ConfigurationServiceImpl() {
         localization = LocalizationImpl.getInstance();
-        p24HttpClient = new P24HttpClient();
+        p24HttpClient = P24HttpClient.getInstance();
         requestUtils = new RequestUtils();
         soapHelper = new SoapHelper();
     }
@@ -214,8 +234,20 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public ReleaseInformation getReleaseInformation() {
-        LocalDate date = LocalDate.parse(RELEASE_DATE, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        return ReleaseInformation.ReleaseBuilder.aRelease().withDate(date).withVersion(VERSION).build();
+        final Properties props = new Properties();
+        try {
+            props.load(ConfigurationServiceImpl.class.getClassLoader().getResourceAsStream("release.properties"));
+        } catch (IOException e) {
+            final String message = "An error occurred reading the file: release.properties";
+            LOGGER.error(message);
+            throw new RuntimeException(message, e);
+        }
+
+        final LocalDate date = LocalDate.parse(props.getProperty("release.date"), DateTimeFormatter.ofPattern(RELEASE_DATE_FORMAT));
+        return ReleaseInformation.ReleaseBuilder.aRelease()
+                .withDate(date)
+                .withVersion(props.getProperty("release.version"))
+                .build();
     }
 
     @Override

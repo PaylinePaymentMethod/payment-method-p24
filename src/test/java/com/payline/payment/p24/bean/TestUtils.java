@@ -52,7 +52,7 @@ public class TestUtils {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withEnvironment(new Environment("", "", "", true))
                 .build();
     }
@@ -74,15 +74,14 @@ public class TestUtils {
                 .withEnvironment(environment)
                 .withTransactionId("10")
                 .withPartnerTransactionId("toto")
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
     }
 
     public static RedirectionPaymentRequest createRedirectionPaymentRequest() {
-        RedirectionPaymentRequest request = RedirectionPaymentRequest.builder().build();
 
+        return RedirectionPaymentRequest.builder().build();
 
-        return request;
     }
 
     public static HttpResponse createResponse(int code, String body) {
@@ -123,7 +122,7 @@ public class TestUtils {
                 .withTransactionId(createRandom())
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withBrowser(new Browser("", Locale.FRANCE));
     }
 

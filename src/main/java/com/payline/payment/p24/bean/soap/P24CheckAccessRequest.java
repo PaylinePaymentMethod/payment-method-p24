@@ -18,8 +18,8 @@ public class P24CheckAccessRequest extends P24SoapRequest {
     }
 
     /**
-     * @param login
-     * @param pass
+     * @param login login
+     * @param pass  pass
      */
     public P24CheckAccessRequest(String login,
                                  String pass) {
@@ -72,14 +72,7 @@ public class P24CheckAccessRequest extends P24SoapRequest {
     @Override
     public String toString() {
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("class P24TestAccessRequest {\n");
-        sb.append("    login: ").append(toIndentedString(mLogin)).append("\n");
-        sb.append("    pass: ").append(toIndentedString(mPass)).append("\n");
-        sb.append("}");
-
-        return sb.toString();
+        return "class P24TestAccessRequest {\n    login: " + toIndentedString(mLogin) + "\n    pass: " + toIndentedString(mPass) + "\n}";
 
     }
 

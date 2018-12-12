@@ -85,8 +85,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
     /**
      * The GoogleDriver has to be in path in order to pass this test.
      *
-     * @param partnerUrl
-     * @return
+     * @param partnerUrl the partner url
+     * @return current url
      */
     @Override
     protected String payOnPartnerWebsite(final String partnerUrl) {
@@ -110,9 +110,8 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
             // Wait for redirection to success or cancel url
             WebDriverWait wait = new WebDriverWait(driver, 30);
             wait.until(ExpectedConditions.or(ExpectedConditions.urlToBe(SUCCESS_URL), ExpectedConditions.urlToBe(CANCEL_URL)));
-            String currentUrl = driver.getCurrentUrl();
+            return driver.getCurrentUrl();
 
-            return currentUrl;
         } finally {
 
             // Stop browser

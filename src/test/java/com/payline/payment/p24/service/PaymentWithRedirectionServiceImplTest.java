@@ -1,7 +1,10 @@
 package com.payline.payment.p24.service;
 
 import com.payline.payment.p24.bean.TestUtils;
-import com.payline.payment.p24.utils.*;
+import com.payline.payment.p24.utils.P24Constants;
+import com.payline.payment.p24.utils.P24HttpClient;
+import com.payline.payment.p24.utils.P24Path;
+import com.payline.payment.p24.utils.SoapHelper;
 import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
 import com.payline.pmapi.bean.payment.Browser;
@@ -16,7 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
@@ -28,11 +31,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Locale;
 
-import static com.payline.payment.p24.bean.TestUtils.NOTIFICATION_URL;
-import static com.payline.payment.p24.bean.TestUtils.SUCCESS_URL;
-import static com.payline.payment.p24.bean.TestUtils.CANCEL_URL;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static com.payline.payment.p24.bean.TestUtils.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -73,8 +72,6 @@ public class PaymentWithRedirectionServiceImplTest {
     private SOAPMessage message = MessageFactory.newInstance().createMessage(null, is);
 
 
-
-
     @InjectMocks
     private PaymentWithRedirectionServiceImpl service;
 
@@ -102,6 +99,7 @@ public class PaymentWithRedirectionServiceImplTest {
         when(httpClient.doPost(anyString(), any(P24Path.class), anyMap())).thenReturn(okResponse);
         when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
         when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.ORDER_ID))).thenReturn("orderId");
+        when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.SOAP_ORDER_ID))).thenReturn("orderIdFull");
         when(soapHelper.getTagContentFromSoapResponseMessage(any(SOAPMessage.class), eq(P24Constants.EMAIL))).thenReturn("toto@toto.com");
 
         RedirectionPaymentRequest redirectionPaymentRequest = RedirectionPaymentRequest.builder()
@@ -113,7 +111,7 @@ public class PaymentWithRedirectionServiceImplTest {
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
                 .withSoftDescriptor("")
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         PaymentResponse response = service.finalizeRedirectionPayment(redirectionPaymentRequest);
 
@@ -132,7 +130,7 @@ public class PaymentWithRedirectionServiceImplTest {
                 .withOrder(TestUtils.createOrder("test"))
                 .withAmount(TestUtils.createAmount("EUR"))
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withTransactionId("")
                 .withSoftDescriptor("")
@@ -144,7 +142,7 @@ public class PaymentWithRedirectionServiceImplTest {
     }
 
     @Test
-    public void finalizeRedirectionPaymentWithHttpException() throws IOException, URISyntaxException{
+    public void finalizeRedirectionPaymentWithHttpException() throws IOException, URISyntaxException {
         when(soapHelper.sendSoapMessage(any(SOAPMessage.class), anyString())).thenReturn(message);
         when(soapHelper.getErrorCodeFromSoapResponseMessage(any(SOAPMessage.class))).thenReturn("0");
 
@@ -156,7 +154,7 @@ public class PaymentWithRedirectionServiceImplTest {
                 .withOrder(TestUtils.createOrder("test"))
                 .withAmount(TestUtils.createAmount("EUR"))
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withTransactionId("")
                 .withSoftDescriptor("")

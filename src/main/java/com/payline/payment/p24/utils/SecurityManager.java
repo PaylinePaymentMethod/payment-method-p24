@@ -1,13 +1,12 @@
 package com.payline.payment.p24.utils;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
 public class SecurityManager {
-    private static final String UTF_8 = "UTF-8";
     private static final String MD_5 = "MD5";
 
     /**
@@ -30,14 +29,14 @@ public class SecurityManager {
 
             // do the hash
             MessageDigest md = MessageDigest.getInstance(MD_5);
-            byte[] byteChain = sb.toString().getBytes(UTF_8);
+            byte[] byteChain = sb.toString().getBytes(StandardCharsets.UTF_8);
             byte[] hash = md.digest(byteChain);
 
             // convert byte[] result into readable String
             BigInteger bigInt = new BigInteger(1, hash);
             return bigInt.toString(16);
 
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             // unreachable statement, this method can't return an error
             return null;
         }

@@ -2,13 +2,18 @@ package com.payline.payment.p24.service;
 
 
 import com.payline.payment.p24.bean.TestUtils;
+import com.payline.pmapi.bean.common.Amount;
+import com.payline.pmapi.bean.common.Buyer;
 import com.payline.pmapi.bean.configuration.PartnerConfiguration;
+import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.Environment;
+import com.payline.pmapi.bean.payment.Order;
 import com.payline.pmapi.bean.paymentform.bean.PaymentFormLogo;
+import com.payline.pmapi.bean.paymentform.bean.form.NoFieldForm;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormConfigurationRequest;
 import com.payline.pmapi.bean.paymentform.request.PaymentFormLogoRequest;
 import com.payline.pmapi.bean.paymentform.response.configuration.PaymentFormConfigurationResponse;
-import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseProvided;
+import com.payline.pmapi.bean.paymentform.response.configuration.impl.PaymentFormConfigurationResponseSpecific;
 import com.payline.pmapi.bean.paymentform.response.logo.PaymentFormLogoResponse;
 import com.payline.pmapi.bean.paymentform.response.logo.impl.PaymentFormLogoResponseFile;
 import org.junit.Assert;
@@ -21,9 +26,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Currency;
 import java.util.Locale;
-
-import static org.mockito.Mockito.mock;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,10 +41,24 @@ public class PaymentFormConfigurationServiceImplTest {
     @Test
     public void testGetPaymentFormConfiguration() {
         // when: getPaymentFormConfiguration is called
-        PaymentFormConfigurationResponse response = service.getPaymentFormConfiguration(mock(PaymentFormConfigurationRequest.class));
+        final PaymentFormConfigurationRequest paymentFormConfigurationRequest = PaymentFormConfigurationRequest.PaymentFormConfigurationRequestBuilder.aPaymentFormConfigurationRequest()
+                .withLocale(Locale.FRANCE)
+                .withEnvironment(new Environment("","","",true))
+                .withPartnerConfiguration(new PartnerConfiguration(Collections.emptyMap(),Collections.emptyMap()))
+                .withContractConfiguration(new ContractConfiguration("",Collections.emptyMap()))
+                .withOrder(Order.OrderBuilder.anOrder().withReference("ref").build())
+                .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
+                .withAmount(new Amount(BigInteger.TEN, Currency.getInstance("EUR")))
+                .build();        PaymentFormConfigurationResponse response = service.getPaymentFormConfiguration(paymentFormConfigurationRequest);
 
         // then: returned object is an instance of PaymentFormConfigurationResponseProvided
-        Assert.assertTrue(response instanceof PaymentFormConfigurationResponseProvided);
+        Assert.assertTrue(response instanceof PaymentFormConfigurationResponseSpecific);
+        PaymentFormConfigurationResponseSpecific paymentFormConfigurationResponse = (PaymentFormConfigurationResponseSpecific) response;
+        Assert.assertTrue(paymentFormConfigurationResponse.getPaymentForm() instanceof NoFieldForm);
+        NoFieldForm noFieldForm = (NoFieldForm) paymentFormConfigurationResponse.getPaymentForm();
+        Assert.assertFalse(noFieldForm.getButtonText().isEmpty());
+        Assert.assertFalse(noFieldForm.getDescription().isEmpty());
+        Assert.assertTrue(noFieldForm.isDisplayButton());
     }
 
     @Test

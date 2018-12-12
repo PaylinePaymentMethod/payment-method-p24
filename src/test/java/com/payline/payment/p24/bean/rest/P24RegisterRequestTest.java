@@ -3,6 +3,7 @@ package com.payline.payment.p24.bean.rest;
 import com.payline.payment.p24.bean.TestUtils;
 import com.payline.payment.p24.errors.P24ErrorMessages;
 import com.payline.payment.p24.errors.P24ValidationException;
+import com.payline.payment.p24.service.enums.BodyMapKeys;
 import com.payline.payment.p24.utils.LocalizationImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.common.Amount;
@@ -14,6 +15,7 @@ import com.payline.pmapi.bean.payment.ContractConfiguration;
 import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.Order;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -75,7 +77,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withOrder(Order.OrderBuilder.anOrder().withReference("").build())
                 .build();
 
@@ -95,7 +97,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(Buyer.BuyerBuilder.aBuyer().build())
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -125,7 +127,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -155,7 +157,7 @@ public class P24RegisterRequestTest {
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
                 .withBrowser(new Browser("", Locale.FRANCE))
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -185,7 +187,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -214,7 +216,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withAmount(new Amount(null, Currency.getInstance("EUR")))
                 .build();
         new P24RegisterRequest(request);
@@ -245,7 +247,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -275,7 +277,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -304,7 +306,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withEnvironment(new Environment("", "", "", true))
                 .build();
         new P24RegisterRequest(request);
@@ -335,7 +337,7 @@ public class P24RegisterRequestTest {
                 .withTransactionId(transactionID)
                 .withSoftDescriptor(softDescriptor)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .build();
         new P24RegisterRequest(request);
     }
@@ -351,6 +353,50 @@ public class P24RegisterRequestTest {
 
         );
         Assert.assertNotNull(map);
+
+    }
+
+    @Test
+    public void createBodyMap_lenght() throws Exception {
+        P24RegisterRequest request = new P24RegisterRequest(createPaymentRequestMandatory());
+        //create char array of specified length
+        char[] charArray = new char[20];
+
+        //fill all elements with the specified char
+        Arrays.fill(charArray, 'A');
+
+        /*
+        Test 20
+         */
+        //create string from char array and returnreturn ;
+        String test20 = new String(charArray);
+        FieldUtils.writeField(request, "transferLabel", test20, true);
+        Map<String, String> map = request.createBodyMap();
+
+        Assert.assertNotNull(map);
+        Assert.assertEquals(test20, map.get(BodyMapKeys.TRANSFER_LABEL.getKey()));
+
+        /*
+        Test 21
+         */
+        String test21 = test20 + "x";
+        FieldUtils.writeField(request, "transferLabel", test21, true);
+        map = request.createBodyMap();
+
+        Assert.assertNotNull(map);
+        Assert.assertEquals(test20, map.get(BodyMapKeys.TRANSFER_LABEL.getKey()));
+
+        /*
+        Test 19
+         */
+        String test19 = test20.substring(1);
+        FieldUtils.writeField(request, "transferLabel", test19, true);
+        map = request.createBodyMap();
+
+        Assert.assertNotNull(map);
+        Assert.assertEquals(test19, map.get(BodyMapKeys.TRANSFER_LABEL.getKey()));
+
+
     }
 
 
@@ -373,7 +419,7 @@ public class P24RegisterRequestTest {
                 .withOrder(order)
                 .withTransactionId(transactionID)
                 .withBuyer(buyer)
-                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(),new HashMap<>()))
+                .withPartnerConfiguration(new PartnerConfiguration(new HashMap<>(), new HashMap<>()))
                 .withBrowser(new Browser("", Locale.FRANCE))
                 .withSoftDescriptor("")
                 .build();

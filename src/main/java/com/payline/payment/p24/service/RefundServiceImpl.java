@@ -62,8 +62,6 @@ public class RefundServiceImpl implements RefundService {
     public RefundResponse refundRequest(RefundRequest refundRequest) {
         int batch = (int) Calendar.getInstance().getTimeInMillis();
         try {
-            SOAPMessage soapResponseMessage = null;
-            SoapErrorCodeEnum errorCode = null;
             boolean isSandbox = requestUtils.isSandbox(refundRequest);
 
             // get all needed infos
@@ -72,15 +70,15 @@ public class RefundServiceImpl implements RefundService {
 
             validateRequest(refundRequest);
             String sessionId = refundRequest.getOrder().getReference();
-            int amount = refundRequest.getOrder().getAmount().getAmountInSmallestUnit().intValue();
+            int amount = refundRequest.getAmount().getAmountInSmallestUnit().intValue();
 
             // Call P24.trnBySessionId and get the orderId from response
             P24TrnBySessionIdRequest trnBySessionIdRequest =
                     new P24TrnBySessionIdRequest().login(merchantId).pass(password).sessionId(sessionId);
-            soapResponseMessage = soapHelper.sendSoapMessage(
+            SOAPMessage soapResponseMessage = soapHelper.sendSoapMessage(
                     trnBySessionIdRequest.buildSoapMessage(isSandbox), P24Url.SOAP_ENDPOINT.getUrl(isSandbox));
 
-            errorCode = getErrorCode(soapResponseMessage);
+            SoapErrorCodeEnum errorCode = getErrorCode(soapResponseMessage);
 
             // ... continue if last ws errorCode = 0
             if (SoapErrorCodeEnum.OK != errorCode) {
