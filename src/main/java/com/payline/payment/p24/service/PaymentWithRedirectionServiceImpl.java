@@ -67,7 +67,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
             String merchantId = requestUtils.getContractValue(redirectionPaymentRequest, P24Constants.MERCHANT_ID);
             String password = requestUtils.getContractValue(redirectionPaymentRequest, P24Constants.MERCHANT_MDP);
-            String sessionId = redirectionPaymentRequest.getTransactionId();
+            String sessionId = redirectionPaymentRequest.getOrder().getReference();
             boolean isSandbox = requestUtils.isSandbox(redirectionPaymentRequest);
 
             // call /trnBySessionId

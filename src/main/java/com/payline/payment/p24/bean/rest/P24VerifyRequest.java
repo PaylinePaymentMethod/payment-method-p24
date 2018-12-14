@@ -26,7 +26,7 @@ public class P24VerifyRequest extends P24Request {
             throws P24ValidationException {
         super(redirectionPaymentRequest);
         validate(redirectionPaymentRequest);
-        this.sessionId = redirectionPaymentRequest.getTransactionId();
+        this.sessionId = redirectionPaymentRequest.getOrder().getReference();
         this.amount = redirectionPaymentRequest.getAmount().getAmountInSmallestUnit().toString();
         this.currency = redirectionPaymentRequest.getAmount().getCurrency().getCurrencyCode();
         this.orderId = orderId;
@@ -37,7 +37,7 @@ public class P24VerifyRequest extends P24Request {
     public P24VerifyRequest(TransactionStatusRequest transactionStatusRequest, String orderId) throws P24ValidationException {
         super(transactionStatusRequest);
         validate(transactionStatusRequest);
-        this.sessionId = transactionStatusRequest.getTransactionId();
+        this.sessionId = transactionStatusRequest.getOrder().getReference();
         this.amount = transactionStatusRequest.getAmount().getAmountInSmallestUnit().toString();
         this.currency = transactionStatusRequest.getAmount().getCurrency().getCurrencyCode();
         this.orderId = orderId;
