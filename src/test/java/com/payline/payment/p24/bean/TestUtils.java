@@ -158,7 +158,7 @@ public class TestUtils {
     }
 
     public static Buyer.FullName createFullName() {
-        return new Buyer.FullName("foo", "bar", Buyer.Civility.UNKNOWN);
+        return new Buyer.FullName("foo", "bar", "3");
     }
 
     public static Map<Buyer.PhoneNumberType, String> createDefaultPhoneNumbers() {
