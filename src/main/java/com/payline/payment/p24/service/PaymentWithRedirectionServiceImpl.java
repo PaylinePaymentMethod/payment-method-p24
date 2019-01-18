@@ -78,8 +78,8 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
             if (SoapErrorCodeEnum.OK == getErrorCode(soapResponseMessage)) {
 
                 // get needed info for REST request
-                String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
-                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
+                String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
+                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
                 String email = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
 
                 // call trnVerify
@@ -98,7 +98,7 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
 
                         return PaymentResponseSuccess.PaymentResponseSuccessBuilder.aPaymentResponseSuccess()
                                 .withStatusCode("0")
-                                .withPartnerTransactionId(sessionId)
+                                .withPartnerTransactionId(redirectionPaymentRequest.getTransactionId())
                                 .withTransactionDetails(Email.EmailBuilder.anEmail().withEmail(email).build())
                                 .withTransactionAdditionalData(additionalData)
                                 .build();
@@ -143,9 +143,9 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
             if (SoapErrorCodeEnum.OK == getErrorCode(soapResponseMessage)) {
 
                 // get needed info for REST request
-                String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
+                String orderId = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
                 String email = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.EMAIL);
-                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.SOAP_ORDER_ID);
+                String orderIdFull = soapHelper.getTagContentFromSoapResponseMessage(soapResponseMessage, P24Constants.ORDER_ID);
 
                 // call trnVerify
                 P24VerifyRequest verifyRequest = new P24VerifyRequest(transactionStatusRequest, orderId);
@@ -188,29 +188,6 @@ public class PaymentWithRedirectionServiceImpl implements PaymentWithRedirection
         } catch (P24ValidationException | URISyntaxException e) {
             return getPaymentResponseFailure(e.getMessage(), FailureCause.INVALID_DATA);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
 

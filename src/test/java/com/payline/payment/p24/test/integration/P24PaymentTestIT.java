@@ -6,12 +6,14 @@ import com.payline.payment.p24.bean.soap.P24CheckAccessRequest;
 import com.payline.payment.p24.service.ConfigurationServiceImpl;
 import com.payline.payment.p24.service.PaymentServiceImpl;
 import com.payline.payment.p24.service.PaymentWithRedirectionServiceImpl;
+import com.payline.payment.p24.service.TransactionManagerServiceImpl;
 import com.payline.payment.p24.utils.P24Constants;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractProperty;
 import com.payline.pmapi.bean.payment.Environment;
 import com.payline.pmapi.bean.payment.PaymentFormContext;
 import com.payline.pmapi.bean.payment.request.PaymentRequest;
+import com.payline.pmapi.bean.payment.response.impl.PaymentResponseSuccess;
 import com.payline.pmapi.integration.AbstractPaymentIntegration;
 import com.payline.pmapi.service.PaymentService;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +30,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.payline.payment.p24.utils.P24Constants.ORDER_ID;
+import static com.payline.payment.p24.utils.P24Constants.SESSION_ID;
+import static com.payline.payment.p24.utils.P24Constants.SOAP_ORDER_ID;
 
 public class P24PaymentTestIT extends AbstractPaymentIntegration {
 
@@ -67,9 +73,15 @@ public class P24PaymentTestIT extends AbstractPaymentIntegration {
         configurationServiceImpl.checkSoapConnection(p24TestAccessRequest, true, errors, Locale.FRENCH);
         Assert.assertTrue(errors.isEmpty());
 
-        this.fullRedirectionPayment(this.createDefaultPaymentRequest(), paymentService, paymentWithRedirectionService);
-
-        // Refund
+        PaymentRequest paymentRequest = this.createDefaultPaymentRequest();
+        PaymentResponseSuccess responseSuccess = this.fullRedirectionPayment(paymentRequest, paymentService, paymentWithRedirectionService);
+//        responseSuccess.getTransactionAdditionalData().
+        TransactionManagerServiceImpl transactionManagerService = new TransactionManagerServiceImpl();
+        Map map = transactionManagerService.readAdditionalData(responseSuccess.getTransactionAdditionalData(), "");
+        Assert.assertEquals(3, map.size());
+        Assert.assertTrue(map.containsKey(SOAP_ORDER_ID));
+        Assert.assertTrue(map.containsKey(ORDER_ID));
+        Assert.assertTrue(map.containsKey(SESSION_ID));
     }
 
     @Override
