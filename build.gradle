@@ -17,14 +17,14 @@ apply from: "monext.gradle"
 
 description = 'payment-method-p24'
 group 'com.payline.payment.p24'
-version '1.2-RC2-SNAPSHOT'
+version '1.2-RC3-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 compileJava.options.encoding = 'UTF-8'
 
 ext {
-    paymentMethodVersion = '1.0-RC5'
+    paymentMethodVersion = '1.0-RC7-SNAPSHOT'
     integrationVersion = '1.0-RC5'
     powerMockVersion = '1.7.0'
     releaseDirectoryPath = 'D:/build'

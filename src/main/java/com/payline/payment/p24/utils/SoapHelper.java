@@ -1,6 +1,6 @@
 package com.payline.payment.p24.utils;
 
-import org.apache.logging.log4j.LogManager;
+import com.payline.pmapi.logger.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.xml.soap.*;

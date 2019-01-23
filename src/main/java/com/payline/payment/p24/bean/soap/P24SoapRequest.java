@@ -2,7 +2,7 @@ package com.payline.payment.p24.bean.soap;
 
 
 import com.payline.payment.p24.utils.SoapHelper;
-import org.apache.logging.log4j.LogManager;
+import com.payline.pmapi.logger.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.xml.XMLConstants;

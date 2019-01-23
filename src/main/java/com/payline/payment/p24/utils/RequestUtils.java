@@ -5,7 +5,7 @@ import com.payline.payment.p24.errors.P24ValidationException;
 import com.payline.pmapi.bean.Request;
 import com.payline.pmapi.bean.configuration.request.ContractParametersCheckRequest;
 import com.payline.pmapi.bean.payment.ContractProperty;
-import org.apache.logging.log4j.LogManager;
+import com.payline.pmapi.logger.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RequestUtils {
