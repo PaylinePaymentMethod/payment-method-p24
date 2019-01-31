@@ -100,7 +100,6 @@ public class ConfigurationServiceImplTest {
     public void getName() {
         when(localization.getSafeLocalizedString(anyString(), eq(locale))).thenReturn(lang);
         String result = configurationService.getName(locale);
-        Assert.assertFalse(StringUtils.isEmpty(result));
         Assert.assertEquals(lang, result);
     }
 
